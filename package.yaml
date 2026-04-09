@@ -1,0 +1,45 @@
+name: ghc-bench
+
+author: Simon Hengel <sol@typeful.net>
+copyright: (c) 2026 Simon Hengel
+
+ghc-options: -Wall
+
+language: GHC2024
+
+default-extensions:
+ - NoImplicitPrelude
+ - OverloadedStrings
+ - RecordWildCards
+ - ViewPatterns
+ - BlockArguments
+ - LambdaCase
+ - NoFieldSelectors
+ - DuplicateRecordFields
+ - OverloadedRecordDot
+
+dependencies:
+  - base == 4.*
+  - bytestring
+  - directory
+  - filepath
+  - process
+  - text
+  - temporary
+  - http-types
+
+source-dirs: src
+
+executable:
+  main: Main.hs
+  source-dirs: driver
+
+tests:
+  spec:
+    cpp-options: -DTEST
+    build-tools: hspec-discover
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - hspec == 2.*
+      - silently

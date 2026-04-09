@@ -1,0 +1,113 @@
+name: Benchmark result
+description: Submit a benchmark result
+labels: ["benchmark result"]
+
+body:
+  - type: textarea
+    attributes:
+      label: Add a description (optional)
+      placeholder: Type your description here…
+
+  - type: markdown
+    attributes:
+      value: |
+        Benchmark Result
+        ================
+        - Please avoid manually modifying this information.
+        - If this information does not accurately describe your system then please state so in the (optional) description, or [open a separate issue](https://github.com/sol/ghc-bench/issues/new).
+        - `ghc-bench` does not collect any information that uniquely identifies a system.  If you still want to redact some information for privacy reasons then please replace it with `[redacted]`.
+
+  - type: input
+    id: time
+    attributes:
+      label: Build time (seconds)
+    validations:
+      required: true
+
+  - type: input
+    id: concurrency
+    attributes:
+      label: Used number of threads
+    validations:
+      required: true
+
+  - type: input
+    id: cpu_name
+    attributes:
+      label: CPU Name
+    validations:
+      required: true
+ 
+  - type: input
+    id: cpuid
+    attributes:
+      label: CPUID (vendor / family / model / stepping)
+    validations:
+      required: true
+
+  - type: input
+    id: cpu_cores
+    attributes:
+      label: Cores
+
+  - type: input
+    id: cpu_threads
+    attributes:
+      label: Threads
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+
+  - type: input
+    id: arch
+    attributes:
+      label: Architecture
+
+  - type: input
+    id: board
+    attributes:
+      label: Motherboard
+    validations:
+      required: true
+
+  - type: input
+    id: ram
+    attributes:
+      label: RAM Size
+
+  - type: input
+    id: system_vendor
+    attributes:
+      label: System Vendor
+      description: For a custom build this is usually `To Be Filled By O.E.M.`.
+
+  - type: input
+    id: product_category
+    attributes:
+      label: Product Category
+
+  - type: input
+    id: product_chassis_type
+    attributes:
+      label: Chassis Type
+      description: The numeric *Chassis Type* identifier as specified by the [SMBIOS Specification](https://www.dmtf.org/sites/default/files/standards/documents/DSP0134_3.9.0.pdf).
+
+  - type: input
+    id: product_family
+    attributes:
+      label: Product Family
+      description: For a custom build this is usually `To Be Filled By O.E.M.`.
+
+  - type: input
+    id: product_name
+    attributes:
+      label: Product Name
+      description: For a custom build this is usually `To Be Filled By O.E.M.`.
+
+  - type: input
+    id: product_version
+    attributes:
+      label: Product Version
+      description: For a custom build this is usually `To Be Filled By O.E.M.`.

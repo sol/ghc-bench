@@ -1,0 +1,10 @@
+:set -isrc -itest -DTEST
+:set -XNoImplicitPrelude
+:set -XOverloadedStrings
+:set -XRecordWildCards
+:set -XViewPatterns
+:set -XBlockArguments
+:set -XLambdaCase
+:set -XNoFieldSelectors
+:set -XDuplicateRecordFields
+:set -XOverloadedRecordDot

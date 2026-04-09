@@ -1,0 +1,45 @@
+module Imports (module Imports) where
+
+import Prelude as Imports hiding (show, lines, unlines, words, unwords, error, putStrLn)
+
+import Data.Maybe as Imports
+
+import Data.Functor as Imports (void, (<&>))
+import Control.Arrow as Imports ((>>>))
+import Control.Monad as Imports (when, unless)
+
+import Data.Text as Imports (Text, show, lines, unlines, words, unwords, pack, unpack, strip)
+import Data.Text.Encoding as Imports (encodeUtf8)
+
+import System.Exit as Imports (ExitCode(..))
+import System.FilePath as Imports ((</>))
+
+import System.Exit (die)
+import System.Directory (removePathForcibly)
+import System.IO.Temp (createTempDirectory)
+import Control.Exception (bracket)
+
+withTempDirectory :: FilePath -> FilePath -> (FilePath -> IO a) -> IO a
+withTempDirectory dir name = bracket (createTempDirectory dir name) removePathForcibly
+
+error :: Text -> IO a
+error message = die $ "ghc-bench: " <> unpack message
+
+class Bind m r where
+  bind :: (a -> r) -> m a -> r
+
+instance Monad m => Bind m (m b) where
+  bind :: (a -> m b) -> m a -> m b
+  bind = (=<<)
+
+instance Bind m r => Bind m (b -> r) where
+  bind :: (a -> b -> r) -> m a -> b -> r
+  bind f ma b = bind (flip f b) ma
+
+infixl 1 -<
+
+(-<) :: Bind m r => (a -> r) -> m a -> r
+(-<) = bind
+
+pass :: Applicative m => m ()
+pass = pure ()
