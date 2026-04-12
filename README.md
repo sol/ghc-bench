@@ -1,4 +1,6 @@
-# Benchmark results
+# `ghc-bench`: Benchmark a Haskell development system
+
+## Benchmark results
 
 | CPU | building GHC 9.12.4 with `--flavour=quickest` |
 | --- | --- |
@@ -6,6 +8,7 @@
 | Intel Core Ultra 7 255H | (no results yet) |
 | Intel Core Ultra 7 258V | (no results yet) |
 | Intel Core i9-10900K | 526s (8m 46s) |
+| Intel Core i7-1165G7 | 715s (11m 55s) |
 
 ## Running `ghc-bench`
 
