@@ -25,21 +25,33 @@ If all of these are on your `PATH` you can benchmark your system with:
 $ ghc-bench
 ```
 
-### Running `ghc-bench` with `stack`
+If you need detailed instructions for `ghcup` or `stack` then read on.
 
-Install `cabal`:
-```console
-stack --resolver=nightly-2026-04-11 install cabal-install
-```
+### Running `ghc-bench` with `ghcup`
 
-Install `ghc-bench`:
+Install `cabal`, `ghc-9.12.4`, and `ghc-bench`:
 ```console
-cabal update && stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH cabal install ghc-bench
+$ ghcup install cabal
+$ ghcup install ghc 9.12.4 --no-set
+$ cabal update && cabal install -w ghc-9.12.4 ghc-bench
 ```
 
 Run `ghc-bench`:
 ```console
-stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-bench
+$ ghc-bench
+```
+
+### Running `ghc-bench` with `stack`
+
+Install `cabal` and `ghc-bench`:
+```console
+$ stack --resolver=nightly-2026-04-11 install cabal-install
+$ cabal update && stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH cabal install ghc-bench
+```
+
+Run `ghc-bench`:
+```console
+$ stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-bench
 ```
 
 ## Details
@@ -54,9 +66,9 @@ Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
 
 Exact steps performed by `ghc-bench`:
 
-- Download the GHC 9.12.4 source tarball to `/tmp/ghc-bench/ghc-9.12.4-src.tar.gz`
-- Unpack GHC sources into a temporary directory under `/tmp/ghc-bench`
-- Set the environment variable `GHC` to the absolute path of `ghc-9.12.4`
-- Run `./configure`
-- Build Hadrian (not measured as part of the benchmark) by invoking `hadrian/build --help` to trigger dependency compilation
-- Run `hadrian/build -j$(nproc) --flavour=quickest`
+1. Download the GHC 9.12.4 source tarball to `/tmp/ghc-bench/ghc-9.12.4-src.tar.gz`
+1. Unpack GHC sources into a temporary directory under `/tmp/ghc-bench`
+1. Set the environment variable `GHC` to the absolute path of `ghc-9.12.4`
+1. Run `./configure`
+1. Build Hadrian (not measured as part of the benchmark) by invoking `hadrian/build --help` to trigger dependency compilation
+1. Run `hadrian/build -j$(nproc) --flavour=quickest`
