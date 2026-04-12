@@ -75,7 +75,7 @@ issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", descr
       (unknown -> True, _) -> [system.product.category, "computer"]
       (vendor, unknown -> True) -> [vendor, system.product.category]
       (vendor, name) -> [vendor, name]
-    
+
     unknown :: Text -> Bool
     unknown = (== "To Be Filled By O.E.M.")
 

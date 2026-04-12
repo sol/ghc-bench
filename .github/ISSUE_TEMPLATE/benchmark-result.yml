@@ -37,7 +37,7 @@ body:
       label: CPU Name
     validations:
       required: true
- 
+
   - type: input
     id: cpuid
     attributes:
