@@ -21,6 +21,23 @@ If all of these are on your `PATH` you can benchmark your system with:
 $ ghc-bench
 ```
 
+### Running `ghc-bench` with `stack`
+
+Install `cabal`:
+```console
+stack --resolver=nightly-2026-04-11 install cabal-install
+```
+
+Install `ghc-bench`:
+```console
+cabal update && stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH cabal install ghc-bench
+```
+
+Run `ghc-bench`:
+```console
+stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-bench
+```
+
 ## Details
 
 Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
