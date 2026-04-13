@@ -22,6 +22,7 @@ default-extensions:
  - NoFieldSelectors
  - DuplicateRecordFields
  - OverloadedRecordDot
+ - DerivingStrategies
 
 dependencies:
   - base == 4.*
