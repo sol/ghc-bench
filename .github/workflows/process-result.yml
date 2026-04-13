@@ -1,0 +1,67 @@
+name: Process benchmark result
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  process-result:
+    if: github.event.label.name == 'benchmark result'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: cabal update
+      - run: cabal build all --dry-run -v0
+
+      - run: echo "version=`ghc --numeric-version`" >> $GITHUB_OUTPUT
+        id: ghc
+
+      - run: echo "store-dir=`cabal -v0 path --store-dir`" >> $GITHUB_OUTPUT
+        id: cabal-path
+
+      - uses: actions/cache/restore@v5
+        id: cache
+        env:
+          key: ${{ runner.os }}-ghc-${{ steps.ghc.outputs.version }}
+        with:
+          path: ${{ steps.cabal-path.outputs.store-dir }}
+          key: ${{ env.key }}-${{ hashFiles('dist-newstyle/cache/plan.json') }}
+          restore-keys: ${{ env.key }}-
+
+      - run: cabal build process-result
+      - run: $(find dist-newstyle/ -name process-result -type f) "${{ github.event.issue.body }}" "${{ github.event.issue.created_at }}"
+
+      - name: Create branch
+        run: |
+          BRANCH="auto/process-result-${{ github.event.issue.number }}"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
+      - name: Commit changes
+        run: |
+          AUTHOR_NAME="${{ github.event.issue.user.login }}"
+          AUTHOR_EMAIL="${{ github.event.issue.user.login }}@users.noreply.github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add results
+          git commit --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" -m "${{ github.event.issue.title }}"
+
+      - name: Push branch
+        run: |
+          git push origin "$BRANCH" --force
+
+      - name: Create PR
+        run: |
+          gh pr create \
+            --title "${{ github.event.issue.title }}" \
+            --body "Close #${{ github.event.issue.number }}." \
+            --head "$BRANCH"
+          # gh pr merge --auto --merge "$BRANCH"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
