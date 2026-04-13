@@ -32,30 +32,58 @@ i10900K_desktop = SystemInfo {
   , ram = "33273524224"
   }
 
-t60_ThinkPad :: SystemInfo
-t60_ThinkPad = SystemInfo {
-    os = "Arch Linux"
+x200 :: SystemInfo
+x200 = SystemInfo {
+    os = "Debian GNU/Linux"
   , arch = "x86_64"
   , vendor = "LENOVO"
   , product = Product {
       category = "laptop"
     , chassis_type = "10"
-    , family = "ThinkPad T60"
-    , name = "1952W5R"
-    , version = "ThinkPad T60"
+    , family = "ThinkPad X200"
+    , name = "7455D7G"
+    , version = "ThinkPad X200"
     }
   , board = Board {
       vendor = "LENOVO"
-    , name = "1952W5R"
+    , name = "7455D7G"
     }
   , cpu = Cpu {
-      name = "Intel(R) Core(TM) 2 Duo Processor T7200 @ 2.00GHz"
+      name = "Intel(R) Core(TM)2 Duo CPU     P8700  @ 2.53GHz"
     , cores = 2
     , threads = 2
     , vendor = Just "GenuineIntel"
     , family = Just "6"
-    , model = Just "15"
-    , stepping = Just "6"
+    , model = Just "23"
+    , stepping = Just "10"
     }
-  , ram = "0"
+  , ram = "3997212672"
+  }
+
+dell_xps :: SystemInfo
+dell_xps = SystemInfo {
+    os = "Arch Linux"
+  , arch = "x86_64"
+  , vendor = "Dell Inc."
+  , product = Product {
+      category = "laptop"
+    , chassis_type = "10"
+    , family = "XPS"
+    , name = "XPS 13 9310"
+    , version = ""
+    }
+  , board = Board {
+      vendor = "Dell Inc."
+    , name = "0GG9PT"
+    }
+  , cpu = Cpu {
+      name = "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz"
+    , cores = 4
+    , threads = 8
+    , vendor = Just "GenuineIntel"
+    , family = Just "6"
+    , model = Just "140"
+    , stepping = Just "1"
+    }
+  , ram = "16461537280"
   }

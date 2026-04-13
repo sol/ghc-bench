@@ -8,6 +8,8 @@ import Data.Functor as Imports (void, (<&>))
 import Control.Arrow as Imports ((>>>))
 import Control.Monad as Imports (when, unless)
 
+import GHC.Generics as Imports (Generic)
+
 import Data.Text as Imports (Text, show, lines, unlines, words, unwords, pack, unpack, strip)
 import Data.Text.Encoding as Imports (encodeUtf8)
 

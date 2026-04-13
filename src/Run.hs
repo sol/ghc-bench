@@ -18,7 +18,7 @@ import SystemInfo qualified
 import Asset (Asset(..))
 import Asset qualified
 
-import Result (Result(..))
+import Result (Concurrency, Result(..))
 import Result qualified
 
 version :: FilePath
@@ -43,33 +43,32 @@ main args = do
   Command.require "cabal"
   ghc <- Command.resolve bootGhc
   createDirectoryIfMissing False baseDir
-  info <- SystemInfo.collect
-  result <- case args of
-    [] -> run ghc sourceTarball
-    ["info"] -> return Result {time = 0, concurrency = 0}
+  system <- SystemInfo.collect
+  concurrency <- nproc
+  time <- case args of
+    [] -> run ghc sourceTarball concurrency
+    ["info"] -> return 0
     _ -> die "usage: ghc-bench [info]"
-  putStrLn $ "Build time: " <> show result.time <> "s"
+  putStrLn $ "Build time: " <> show time <> "s"
   putStrLn ""
-  Result.submit result info
+  Result.submit Result {..}
 
-run :: FilePath -> Asset -> IO Result
-run ghc source = withTempDirectory baseDir "run" \ sandbox -> do
+run :: FilePath -> Asset -> Concurrency -> IO Int
+run ghc source concurrency = withTempDirectory baseDir "run" \ sandbox -> do
   Asset.download source
   tar ["-xf", source.path, "-C", sandbox]
-  build (sandbox </> "ghc-" <> version) ghc
+  build (sandbox </> "ghc-" <> version) ghc concurrency
 
-build :: FilePath -> FilePath -> IO Result
-build dir ghc = do
+build :: FilePath -> FilePath -> Concurrency -> IO Int
+build dir ghc concurrency = do
   setEnv "GHC" ghc True
   sh dir "./configure"
 
   -- this makes sure that building hadrian dependencies is not measured
   sh dir "hadrian/build --help"
 
-  concurrency <- nproc
-  time <- measure do
+  measure do
     sh dir $ "hadrian/build -j" <> Prelude.show concurrency <> " --flavour=quickest"
-  return Result{..}
 
 measure :: IO () -> IO Int
 measure action = do

@@ -15,6 +15,8 @@ module Command (
 
 , curl
 , tar
+
+, Concurrency(..)
 ) where
 
 import Imports hiding (strip)
@@ -24,6 +26,9 @@ import Data.Text qualified as T
 
 import System.Process (readProcessWithExitCode, rawSystem, callProcess)
 import System.Process qualified as Process
+
+newtype Concurrency = Concurrency Int
+  deriving newtype (Eq, Show, Read, Num)
 
 eval :: String -> IO Text
 eval command = run "bash" ["-c", command]
@@ -48,7 +53,7 @@ lscpu = run "lscpu"
 sha256sum :: String -> IO Text
 sha256sum file = T.take 64 <$> run "sha256sum" [file]
 
-nproc :: IO Int
+nproc :: IO Concurrency
 nproc = read <$> Process.readProcess "nproc" [] ""
 
 curl :: [String] -> IO ()

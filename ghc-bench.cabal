@@ -43,6 +43,7 @@ executable ghc-bench
       NoFieldSelectors
       DuplicateRecordFields
       OverloadedRecordDot
+      DerivingStrategies
   ghc-options: -Wall
   build-depends:
       base ==4.*
@@ -83,6 +84,7 @@ test-suite spec
       NoFieldSelectors
       DuplicateRecordFields
       OverloadedRecordDot
+      DerivingStrategies
   ghc-options: -Wall
   cpp-options: -DTEST
   build-tool-depends:

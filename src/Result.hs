@@ -2,6 +2,7 @@
 module Result (
   submit
 , Result(..)
+, Concurrency(..)
 #ifdef TEST
 , issueTitle
 #endif
@@ -13,6 +14,7 @@ import Data.Text qualified as T
 import Data.ByteString.Char8 (ByteString, putStrLn)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
+import Command (Concurrency(..))
 import SystemInfo
 
 base :: ByteString
@@ -20,16 +22,17 @@ base = "https://github.com/sol/ghc-bench/issues/new"
 
 data Result = Result {
   time :: Int
-, concurrency :: Int
-} deriving (Eq, Show)
+, concurrency :: Concurrency
+, system :: SystemInfo
+} deriving (Eq, Show, Generic)
 
-submit :: Result -> SystemInfo -> IO ()
-submit result system = do
+submit :: Result -> IO ()
+submit result = do
   putStrLn "Open this URL to submit your result:"
-  putStrLn $ issueUrl result system
+  putStrLn $ issueUrl result
 
-issueUrl :: Result -> SystemInfo -> ByteString
-issueUrl result system = base <> renderQuery [
+issueUrl :: Result -> ByteString
+issueUrl result = base <> renderQuery [
     ("template", "benchmark-result.yml")
   , ("title", issueTitle result.time system)
 
@@ -58,6 +61,9 @@ issueUrl result system = base <> renderQuery [
   , ("ram", system.ram)
   ]
   where
+    system :: SystemInfo
+    system = result.system
+
     cpuid :: Text
     cpuid = T.intercalate " / " [
         fromMaybe "unknown" system.cpu.vendor
