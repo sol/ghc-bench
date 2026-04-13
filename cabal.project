@@ -3,4 +3,6 @@ packages: .
 program-options
   ghc-options: -Werror
 
+allow-newer: all
+
 tests: True

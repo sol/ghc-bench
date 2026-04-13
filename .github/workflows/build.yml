@@ -30,7 +30,35 @@ jobs:
       - uses: hspec/setup-haskell@v1
         with:
           ghc-version: ${{ matrix.ghc }}
-      - uses: sol/run-haskell-tests@v2
+
+      - run: cabal update
+      - run: cabal build all --dry-run -v0
+
+      - run: echo "version=`ghc --numeric-version`" >> $GITHUB_OUTPUT
+        id: ghc
+
+      - run: echo "store-dir=`cabal -v0 path --store-dir`" >> $GITHUB_OUTPUT
+        id: cabal-path
+
+      - uses: actions/cache/restore@v3
+        id: cache
+        env:
+          key: ${{ runner.os }}-ghc-${{ steps.ghc.outputs.version }}
+        with:
+          path: ${{ steps.cabal-path.outputs.store-dir }}
+          key: ${{ env.key }}-${{ hashFiles('dist-newstyle/cache/plan.json') }}
+          restore-keys: ${{ env.key }}-
+
+      - run: cabal build all --only-dependencies
+
+      - uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.cabal-path.outputs.store-dir }}
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - run: cabal build all
+      - run: cabal test spec --test-show-details=direct
 
   success:
     needs: build

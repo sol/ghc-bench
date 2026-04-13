@@ -56,6 +56,43 @@ executable ghc-bench
     , text
   default-language: GHC2024
 
+test-suite process-result
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Asset
+      Command
+      Imports
+      Result
+      Run
+      SystemInfo
+  hs-source-dirs:
+      src
+      process-result
+  default-extensions:
+      NoImplicitPrelude
+      OverloadedStrings
+      RecordWildCards
+      ViewPatterns
+      BlockArguments
+      LambdaCase
+      NoFieldSelectors
+      DuplicateRecordFields
+      OverloadedRecordDot
+      DerivingStrategies
+  ghc-options: -Wall
+  build-depends:
+      base ==4.*
+    , bytestring
+    , directory
+    , filepath
+    , http-types
+    , process
+    , temporary
+    , text
+    , yaml
+  default-language: GHC2024
+
 test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
