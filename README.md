@@ -11,6 +11,19 @@
 | Intel Core i7-1165G7 | 715s (11m 55s) |
 | Intel Core 2 Duo P8700 | 3013s (50m 13s) |
 
+## About
+`ghc-bench` measures how well a system performs on Haskell development workloads compared to other systems.
+
+It allows you to:
+- benchmark a system
+- submit benchmark results via GitHub issues
+- compare benchmark results across systems
+
+This can be used to:
+- verify that a system delivers expected performance
+- understand the impact of a hardware upgrade
+- guide purchasing decisions
+
 ## Running `ghc-bench`
 
 Requirements:
