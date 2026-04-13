@@ -3,15 +3,19 @@ module Result (
   submit
 , Result(..)
 , Concurrency(..)
+, parseFromIssueBody
+, resultPath
 #ifdef TEST
 , issueTitle
 #endif
 ) where
 
-import Imports
+import Imports hiding (product)
+import Prelude qualified
 
 import Data.Text qualified as T
 import Data.ByteString.Char8 (ByteString, putStrLn)
+import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
 import Command (Concurrency(..))
@@ -82,14 +86,129 @@ issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", descr
       (vendor, unknown -> True) -> [vendor, system.product.category]
       (vendor, name) -> [vendor, name]
 
-    unknown :: Text -> Bool
-    unknown = (== "To Be Filled By O.E.M.")
-
     cpu :: Text
     cpu = case system.cpu.vendor of
       Just "GenuineIntel" -> case T.breakOn " @ " system.cpu.name of
         (name, _) -> T.replace "(TM)" "" $ T.replace "(R)" "" name
       _ -> system.cpu.name
 
+unknown :: Text -> Bool
+unknown = (== "To Be Filled By O.E.M.")
+
 renderQuery :: [(ByteString, Text)] -> ByteString
 renderQuery = renderSimpleQuery True . map (fmap encodeUtf8)
+
+parseFromIssueBody :: Text -> Result
+parseFromIssueBody markdown = Result {
+    time = int "Build time (seconds)"
+  , concurrency = Concurrency $ int "Used number of threads"
+  , system
+  }
+  where
+    system :: SystemInfo
+    system = SystemInfo {
+        os = get "Operating System"
+      , arch = get "Architecture"
+      , vendor = get "System Vendor"
+      , product
+      , board
+      , cpu
+      , ram = get "RAM Size"
+      }
+
+    product :: Product
+    product = Product {
+        category = get "Product Category"
+      , chassis_type = get "Chassis Type"
+      , family = get "Product Family"
+      , name = get "Product Name"
+      , version = get "Product Version"
+      }
+
+    board :: Board
+    board = case T.breakOnEnd " " $ get "Motherboard" of
+      (strip -> vendor, name) -> Board {..}
+
+    cpuid :: Text
+    cpuid = get "CPUID (vendor / family / model / stepping)"
+
+    cpu :: Cpu
+    cpu = case map unknownToNothing $ T.splitOn " / " cpuid of
+      [vendor, family, model, stepping] -> Cpu {
+          name = get "CPU Name"
+        , cores = int "Cores"
+        , threads = int "Threads"
+        , ..
+        }
+      _ -> Prelude.error $ "Invalid CPUID: " <> unpack cpuid
+
+    unknownToNothing :: Text -> Maybe Text
+    unknownToNothing "unknown" = Nothing
+    unknownToNothing value = Just value
+
+    get :: Text -> Text
+    get key = case lookup key sections of
+      Just value -> value
+      Nothing -> Prelude.error $ "Missing field: " <> unpack key
+
+    int :: Text -> Int
+    int = read . unpack . get
+
+    sections :: [(Text, Text)]
+    sections = parseSections markdown
+
+    parseSections :: Text -> [(Text, Text)]
+    parseSections = map parseSection . reverse . drop 1 . T.splitOn "\n### "
+      where
+        parseSection :: Text -> (Text, Text)
+        parseSection = bimap strip strip . T.break (== '\n') >>> \ case
+          (key, "_No response_") -> (key, "")
+          (key, value) -> (key, value)
+
+newtype Timestamp = Timestamp String
+  deriving newtype (Eq, Show, Read, IsString)
+
+resultPath :: Timestamp -> SystemInfo -> FilePath
+resultPath (Timestamp timestamp) system = joinPath $ sanitizePathComponents path
+  where
+    path :: [Text]
+    path = "results" : vendor : cpu ++  [file]
+
+    vendor :: Text
+    vendor = case system.cpu.vendor of
+      Just "GenuineIntel" -> "intel"
+      Just "AuthenticAMD" -> "amd"
+      Just name -> name
+      Nothing -> "unknown"
+
+    cpu :: [Text]
+    cpu = cpuToPathComponents system.cpu
+
+    file :: Text
+    file = model <> "_" <> pack timestamp <> ".yaml"
+
+    model :: Text
+    model = T.intercalate "-"  case (system.vendor, system.product.name) of
+      ("LENOVO", _) -> [tryStripPrefix "ThinkPad " system.product.version, system.product.name]
+      (_, unknown -> True) -> [system.board.vendor, system.board.name]
+      (_, name) -> [name]
+
+cpuToPathComponents :: Cpu -> [Text]
+cpuToPathComponents cpu = case (cpu.vendor, cpu.family, cpu.model, cpu.stepping) of
+  (Just "GenuineIntel", Just "6", Just "165", Just "5") -> ["10th", T.take 9 $ T.drop 18 cpu.name]
+  (Just "GenuineIntel", Just "6", Just "140", Just "1") -> ["11th", T.take 9 $ T.drop 27 cpu.name]
+  (Just "GenuineIntel", Just "6", Just "23", Just "10") -> ["core_2", T.take 5 $ T.drop 31 cpu.name]
+  _ -> ["unknown", T.replace " " "_" cpu.name]
+
+sanitizePathComponent :: Text -> FilePath
+sanitizePathComponent component = case sanitize component of
+  "" -> "unknown"
+  name -> name
+  where
+    sanitize = unpack . T.filter (/= '\0') . T.replace "/" "-" . T.intercalate "-" . T.words
+
+sanitizePathComponents :: [Text] -> [FilePath]
+sanitizePathComponents = map sanitizePathComponent
+
+tryStripPrefix :: Text -> Text -> Text
+tryStripPrefix prefix value = fromMaybe value $ T.stripPrefix prefix value

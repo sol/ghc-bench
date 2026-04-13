@@ -24,7 +24,7 @@ data SystemInfo = SystemInfo {
 , board :: Board
 , cpu :: Cpu
 , ram :: Text
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
 
 collect :: IO SystemInfo
 collect = do
@@ -43,7 +43,7 @@ data Product = Product {
 , family :: Text
 , name :: Text
 , version :: Text
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
 
 getProductInfo :: IO Product
 getProductInfo = do
@@ -69,7 +69,7 @@ interpretChassisType = \ case
 data Board = Board {
   vendor :: Text
 , name :: Text
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
 
 getBoardInfo :: IO Board
 getBoardInfo = do
@@ -85,7 +85,7 @@ data Cpu = Cpu {
 , family :: Maybe Text
 , model :: Maybe Text
 , stepping :: Maybe Text
-} deriving (Eq, Show)
+} deriving (Eq, Show, Generic)
 
 getCpuInfo :: IO Cpu
 getCpuInfo = do
