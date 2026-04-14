@@ -1,0 +1,24 @@
+time: 3013
+concurrency: 2
+system:
+  os: Debian GNU/Linux
+  arch: x86_64
+  vendor: LENOVO
+  product:
+    category: laptop
+    chassis_type: '10'
+    name: 7455D7G
+    family: ThinkPad X200
+    version: ThinkPad X200
+  board:
+    name: 7455D7G
+    vendor: LENOVO
+  cpu:
+    name: Intel(R) Core(TM)2 Duo CPU     P8700  @ 2.53GHz
+    cores: 2
+    threads: 2
+    vendor: GenuineIntel
+    family: '6'
+    model: '23'
+    stepping: '10'
+  ram: 4
