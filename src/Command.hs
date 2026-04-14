@@ -54,7 +54,7 @@ sha256sum :: String -> IO Text
 sha256sum file = T.take 64 <$> run "sha256sum" [file]
 
 nproc :: IO Concurrency
-nproc = read <$> Process.readProcess "nproc" [] ""
+nproc = read <$> readProcess "nproc" [] ""
 
 curl :: [String] -> IO ()
 curl = callProcess "curl"
