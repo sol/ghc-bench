@@ -64,4 +64,4 @@ jobs:
             --head "$BRANCH"
           # gh pr merge --auto --merge "$BRANCH"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OPEN_RESULT_PR }}
