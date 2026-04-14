@@ -23,7 +23,7 @@ data SystemInfo = SystemInfo {
 , product :: Product
 , board :: Board
 , cpu :: Cpu
-, ram :: Text
+, ram :: Int
 } deriving (Eq, Show, Generic)
 
 collect :: IO SystemInfo
@@ -34,8 +34,13 @@ collect = do
   product <- getProductInfo
   board <- getBoardInfo
   cpu <- getCpuInfo
-  ram <- free ["-b"] >>= awk "/Mem:/ {print $2}" <&> strip
+  ram <- free ["-b"] >>= awk "/Mem:/ {print $2}" <&> toGb . read . strip
   return SystemInfo {..}
+  where
+    toGb :: Int -> Int
+    toGb bytes = case ceiling @Double $ fromIntegral bytes / 1024 / 1024 / 1024 of
+      31 -> 32 -- adjust for reserved ram that is not visible to the os
+      n -> n
 
 data Product = Product {
   category :: Text

@@ -29,7 +29,7 @@ i10900K_desktop = SystemInfo {
     , model = Just "165"
     , stepping = Just "5"
     }
-  , ram = "33273524224"
+  , ram = 32
   }
 
 x200 :: SystemInfo
@@ -57,7 +57,7 @@ x200 = SystemInfo {
     , model = Just "23"
     , stepping = Just "10"
     }
-  , ram = "3997212672"
+  , ram = 4
   }
 
 dell_xps :: SystemInfo
@@ -85,5 +85,5 @@ dell_xps = SystemInfo {
     , model = Just "140"
     , stepping = Just "1"
     }
-  , ram = "16461537280"
+  , ram = 16
   }

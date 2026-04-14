@@ -62,7 +62,7 @@ issueUrl result = base <> renderQuery [
 
   , ("cpuid", cpuid)
 
-  , ("ram", system.ram)
+  , ("ram", show system.ram)
   ]
   where
     system :: SystemInfo
@@ -113,7 +113,7 @@ parseFromIssueBody markdown = Result {
       , product
       , board
       , cpu
-      , ram = get "RAM Size"
+      , ram = int "RAM Size (GB)"
       }
 
     product :: Product
@@ -152,7 +152,7 @@ parseFromIssueBody markdown = Result {
       Nothing -> Prelude.error $ "Missing field: " <> unpack key
 
     int :: Text -> Int
-    int = read . unpack . get
+    int = read . get
 
     sections :: [(Text, Text)]
     sections = parseSections markdown
