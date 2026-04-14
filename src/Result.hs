@@ -33,7 +33,7 @@ data Result = Result {
 submit :: Result -> IO ()
 submit result = do
   putStrLn "Open this URL to submit your result:"
-  putStrLn $ issueUrl result
+  putStrLn $ "\n  " <> issueUrl result
 
 issueUrl :: Result -> ByteString
 issueUrl result = base <> renderQuery [

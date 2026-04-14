@@ -16,6 +16,10 @@ module Command (
 , tar
 
 , Concurrency(..)
+
+, callWith
+, Env(..)
+, chdir
 ) where
 
 import Imports hiding (strip)
@@ -23,7 +27,8 @@ import Imports hiding (strip)
 import Data.Char (isSpace)
 import Data.Text qualified as T
 
-import System.Process (readProcessWithExitCode, callProcess)
+import System.Environment (getEnvironment)
+import System.Process hiding (readProcess, callProcess)
 import System.Process qualified as Process
 
 newtype Concurrency = Concurrency Int
@@ -51,10 +56,10 @@ nproc :: IO Concurrency
 nproc = read <$> readProcess "nproc" [] ""
 
 curl :: [String] -> IO ()
-curl = callProcess "curl"
+curl = call "curl"
 
 tar :: [String] -> IO ()
-tar = callProcess "tar"
+tar = call "tar"
 
 requireAll :: IO ()
 requireAll = do
@@ -87,3 +92,48 @@ run command args = readProcess command args ""
 
 readProcess :: FilePath -> [FilePath] -> Text -> IO Text
 readProcess name args input = pack <$> Process.readProcess name args (unpack input)
+
+call :: FilePath -> [FilePath] -> IO ()
+call = callWith mempty
+
+callWith :: Env -> FilePath -> [FilePath] -> IO ()
+callWith Env{..} command args = do
+  env <- case extend of
+    [] -> return Nothing
+    values -> Just . (values ++) <$> getEnvironment
+  callProcess (proc command args) {
+      cwd = case dir of
+        "" -> Nothing
+        d -> Just d
+    , env
+    }
+
+data Env = Env {
+  dir :: FilePath
+, extend :: [(FilePath, FilePath)]
+}
+
+instance Semigroup Env where
+  Env _ envl <> Env dir envr = Env dir (envl ++ envr)
+
+instance Monoid Env where
+  mempty = Env "" []
+
+chdir :: FilePath -> Env
+chdir dir = mempty { dir }
+
+callProcess :: CreateProcess -> IO ()
+callProcess command = withCreateProcess command wait
+  where
+    wait _ _ _ = waitForProcess >=> \ case
+      ExitSuccess -> pass
+      ExitFailure status -> externalCommandFailed status case cmdspec command of
+        ShellCommand cmd -> [cmd]
+        RawCommand cmd args -> cmd : args
+
+externalCommandFailed :: Int -> [String] -> IO a
+externalCommandFailed status command = Imports.error $ T.intercalate "\n" [
+    "external command failed with exit status " <> show status
+  , ""
+  , "  " <> unwords (map pack command)
+  ]

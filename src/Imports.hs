@@ -8,7 +8,7 @@ import Data.String as Imports (IsString(..))
 import Data.Functor as Imports (void, (<&>))
 import Data.Bifunctor as Imports (Bifunctor(..))
 import Control.Arrow as Imports ((>>>))
-import Control.Monad as Imports (when, unless)
+import Control.Monad as Imports (when, unless, (>=>))
 import Data.Foldable as Imports (for_)
 
 import GHC.Stack as Imports (HasCallStack)
