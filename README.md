@@ -82,15 +82,14 @@ $ stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-b
 
 `ghc-bench` never submits results on its own.
 
-On benchmark completion it generates a URL that pre-fills a GitHub issue.
+Upon completion, it generates a URL that pre-fills a GitHub issue.
 
-To submit a benchmark result follow those two steps:
+To submit a benchmark result, follow these two steps:
 
 1. Open the generated URL
-1. Submit a GitHub issue
+1. Submit the GitHub issue
 
-Benchmark results are then processed by a GitHub action.
-
+Benchmark results are then processed by a GitHub Action.
 ## Details
 
 Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
