@@ -5,7 +5,10 @@
 | CPU | building GHC 9.12.4 with `--flavour=quickest` |
 | --- | --- |
 | Intel Core Ultra 7 270K Plus | (no results yet) |
+| AMD Ryzen AI Max+ 395 | (no results yet) |
+| AMD Ryzen 7 9700X | (no results yet) |
 | Intel Core Ultra 7 255H | (no results yet) |
+| AMD Ryzen AI 7 350 | (no results yet) |
 | Intel Core Ultra 7 258V | (no results yet) |
 | Intel Core i9-10900K | 526s (8m 46s) |
 | Intel Core i7-1165G7 | 715s (11m 55s) |
@@ -23,6 +26,14 @@ This can be used to:
 - verify that a system delivers expected performance
 - understand the impact of a hardware upgrade
 - guide purchasing decisions
+
+## Workloads
+
+I'm interested in the following workloads:
+
+- Building GHC
+- Building a Cabal project (not implemented yet)
+- Loading a project into `ghci` (not implemented yet)
 
 ## Running `ghc-bench`
 
@@ -66,6 +77,19 @@ Run `ghc-bench`:
 ```console
 $ stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-bench
 ```
+
+## Submitting a benchmark result
+
+`ghc-bench` never submits results on its own.
+
+On benchmark completion it generates a URL that pre-fills a GitHub issue.
+
+To submit a benchmark result follow those two steps:
+
+1. Open the generated URL
+1. Submit a GitHub issue
+
+Benchmark results are then processed by a GitHub action.
 
 ## Details
 
