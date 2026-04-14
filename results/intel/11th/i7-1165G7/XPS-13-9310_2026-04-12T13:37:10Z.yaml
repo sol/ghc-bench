@@ -1,0 +1,24 @@
+time: 715
+concurrency: 8
+system:
+  os: Arch Linux
+  arch: x86_64
+  vendor: Dell Inc.
+  product:
+    category: laptop
+    chassis_type: '10'
+    name: XPS 13 9310
+    family: XPS
+    version: ''
+  board:
+    name: 0GG9PT
+    vendor: Dell Inc.
+  cpu:
+    name: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+    cores: 4
+    threads: 8
+    vendor: GenuineIntel
+    family: '6'
+    model: '140'
+    stepping: '1'
+  ram: 16
