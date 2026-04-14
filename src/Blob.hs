@@ -1,6 +1,6 @@
-module Asset (
+module Blob (
   download
-, Asset(..)
+, Blob(..)
 ) where
 
 import Imports
@@ -9,16 +9,16 @@ import System.Directory (doesFileExist, renameFile)
 
 import Command (curl, sha256sum)
 
-data Asset = Asset {
+data Blob = Blob {
   url :: FilePath
 , path :: FilePath
 , hash :: Text
 } deriving (Eq, Show)
 
-download :: Asset -> IO ()
-download asset = do
-  ensure asset.url asset.path
-  verify asset.path asset.hash
+download :: Blob -> IO ()
+download blob = do
+  ensure blob.url blob.path
+  verify blob
 
 ensure :: FilePath -> FilePath -> IO ()
 ensure url path = unless -< doesFileExist path $ do
@@ -26,11 +26,14 @@ ensure url path = unless -< doesFileExist path $ do
   curl ["-L", url, "-o", tmp]
   renameFile tmp path
 
-verify :: FilePath -> Text -> IO ()
-verify path expected = do
+verify :: Blob -> IO ()
+verify Blob {..} = do
   actual <- sha256sum path
-  when (actual /= expected) . error $ unlines [
-      "SHA256 mismatch!"
-    , "Expected: " <> expected
-    , "Actual:   " <> actual
+  when (actual /= hash) . error $ unlines [
+      "sha256sum mismatch!"
+    , ""
+    , "  url:      " <> pack url
+    , "  file:     " <> pack path
+    , "  expected: " <> hash
+    , "  actual:   " <> actual
     ]

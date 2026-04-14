@@ -24,11 +24,15 @@ source-repository head
 executable ghc-bench
   main-is: Main.hs
   other-modules:
-      Asset
+      Benchmark.BuildCabalPackage
+      Benchmark.BuildGhc
+      Benchmark.Util
+      Blob
       Command
       Imports
       Result
       Run
+      System.Process.Extra
       SystemInfo
   hs-source-dirs:
       src
@@ -60,11 +64,15 @@ test-suite process-result
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      Asset
+      Benchmark.BuildCabalPackage
+      Benchmark.BuildGhc
+      Benchmark.Util
+      Blob
       Command
       Imports
       Result
       Run
+      System.Process.Extra
       SystemInfo
   hs-source-dirs:
       src
@@ -97,11 +105,15 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Asset
+      Benchmark.BuildCabalPackage
+      Benchmark.BuildGhc
+      Benchmark.Util
+      Blob
       Command
       Imports
       Result
       Run
+      System.Process.Extra
       SystemInfo
       CommandSpec
       Fixtures.System

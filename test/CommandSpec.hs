@@ -17,6 +17,6 @@ spec = do
     context "when executable does not exist" do
       it "terminates" do
         hCapture [stderr] (try $ resolve "d3b07384") `shouldReturn` (
-            "ghc-bench: `d3b07384` is required, but couldn't be found on the search PATH.\n"
+            "\nghc-bench: `d3b07384` is required, but couldn't be found on the search PATH.\n"
           , Left $ ExitFailure 1
           )

@@ -4,7 +4,6 @@ module Command (
 , resolve
 
 , eval
-, sh
 
 , awk
 , uname
@@ -24,7 +23,7 @@ import Imports hiding (strip)
 import Data.Char (isSpace)
 import Data.Text qualified as T
 
-import System.Process (readProcessWithExitCode, rawSystem, callProcess)
+import System.Process (readProcessWithExitCode, callProcess)
 import System.Process qualified as Process
 
 newtype Concurrency = Concurrency Int
@@ -32,11 +31,6 @@ newtype Concurrency = Concurrency Int
 
 eval :: String -> IO Text
 eval command = run "bash" ["-c", command]
-
-sh :: FilePath -> String -> IO ()
-sh dir command = rawSystem "bash" ["-c", "cd " <> dir <> " && " <> command] >>= \ case
-  ExitSuccess -> pass
-  ExitFailure _ -> error $ "Running `" <> pack command <> "` failed!"
 
 awk :: Text -> Text -> IO Text
 awk command = readProcess "awk" [unpack command]
@@ -74,7 +68,7 @@ requireAll = do
   require "curl"
   require "tar"
 
-require :: String -> IO ()
+require :: FilePath -> IO ()
 require = void . resolve
 
 resolve :: FilePath -> IO FilePath
@@ -88,7 +82,7 @@ resolve name = readProcessWithExitCode "which" [name] "" >>= \ case
     strip :: String -> String
     strip = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
-run :: String -> [String] -> IO Text
+run :: FilePath -> [FilePath] -> IO Text
 run command args = readProcess command args ""
 
 readProcess :: FilePath -> [FilePath] -> Text -> IO Text

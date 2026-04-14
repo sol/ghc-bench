@@ -31,7 +31,7 @@ withTempDirectory :: FilePath -> FilePath -> (FilePath -> IO a) -> IO a
 withTempDirectory dir name = bracket (createTempDirectory dir name) removePathForcibly
 
 error :: Text -> IO a
-error message = die $ "ghc-bench: " <> unpack message
+error message = die $ "\nghc-bench: " <> unpack message
 
 read :: HasCallStack => Read a => Text -> a
 read input = case readMaybe (unpack input) of
