@@ -1,10 +1,21 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module ResultSpec (spec) where
 
 import Helper
+
+import Control.Exception
+import Data.Ord (comparing)
+import Data.Yaml (ToJSON)
+import Data.Yaml.Pretty qualified as Yaml
+import Data.ByteString (ByteString)
+import Data.ByteString qualified as B
+import System.Directory (listDirectory, createDirectoryIfMissing)
+import System.FilePath (takeDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
 
 import Fixtures.System qualified as System
 
+import SystemInfo
 import Result
 
 spec :: Spec
@@ -31,19 +42,19 @@ spec = do
   describe "parseFromIssueBody" do
     let
       fixtures = [
-          ("test/fixtures/i10900K_desktop", Result {
+          ("raw/2026-04-12T16:01:13Z", Result {
               time = 526
             , concurrency = 20
             , system = System.i10900K_desktop
             }
           )
-        , ("test/fixtures/dell_xps", Result {
+        , ("raw/2026-04-12T13:37:10Z", Result {
               time = 715
             , concurrency = 8
             , system = System.dell_xps
             }
           )
-        , ("test/fixtures/x200", Result {
+        , ("raw/2026-04-12T17:38:23Z", Result {
               time = 3013
             , concurrency = 2
             , system = System.x200
@@ -71,3 +82,68 @@ spec = do
       it "creates a descriptive path" do
         resultPath "2026-04-13" System.x200 `shouldBe`
           "results/intel/core_2/P8700/X200-7455D7G_2026-04-13.yaml"
+
+  it "process results" do
+    processResults "raw"
+
+processResults :: FilePath -> IO ()
+processResults dir = do
+  listDirectory dir >>= traverse_ \ name -> do
+    Utf8.readFile (dir </> name) >>= processResult name
+
+processResult :: FilePath -> Text -> IO ()
+processResult timestamp body = do
+  let
+    result :: Result
+    result = parseFromIssueBody body
+
+    path :: FilePath
+    path = resultPath (fromString timestamp) result.system
+
+  encodeFile path result
+
+encodeFile :: FilePath -> Result -> IO ()
+encodeFile file result = do
+  ensureFile file $ Yaml.encodePretty conf result
+  where
+    conf :: Yaml.Config
+    conf = Yaml.setConfCompare (comparing byFieldOrder) Yaml.defConfig
+
+    byFieldOrder :: Text -> Int
+    byFieldOrder name = fromMaybe maxBound (lookup name fieldOrder)
+
+ensureFile :: FilePath -> ByteString -> IO ()
+ensureFile file new = do
+  old <- try @IOException $ B.readFile file
+  unless (old == Right new) do
+    createDirectoryIfMissing True (takeDirectory file)
+    B.writeFile file new
+
+fieldOrder :: [(Text, Int)]
+fieldOrder = flip zip [1..] [
+    "time"
+  , "concurrency"
+  , "os"
+  , "arch"
+  , "category"
+  , "chassis_type"
+  , "name"
+  , "cores"
+  , "threads"
+  , "vendor"
+  , "family"
+  , "model"
+  , "stepping"
+  , "version"
+  , "product"
+  , "board"
+  , "cpu"
+  , "ram"
+  ]
+
+instance ToJSON Result
+deriving newtype instance ToJSON Concurrency
+instance ToJSON SystemInfo
+instance ToJSON Product
+instance ToJSON Board
+instance ToJSON Cpu

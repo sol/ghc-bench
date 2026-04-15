@@ -41,12 +41,6 @@ executable:
   source-dirs: driver
 
 tests:
-  process-result:
-    main: Main.hs
-    source-dirs: process-result
-    dependencies:
-      - yaml
-
   spec:
     cpp-options: -DTEST
     build-tools: hspec-discover
@@ -54,4 +48,5 @@ tests:
     source-dirs: test
     dependencies:
       - hspec == 2.*
+      - yaml
       - silently

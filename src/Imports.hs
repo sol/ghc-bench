@@ -9,7 +9,7 @@ import Data.Functor as Imports (void, (<&>))
 import Data.Bifunctor as Imports (Bifunctor(..))
 import Control.Arrow as Imports ((>>>))
 import Control.Monad as Imports (when, unless, (>=>))
-import Data.Foldable as Imports (for_)
+import Data.Foldable as Imports (for_, traverse_)
 
 import GHC.Stack as Imports (HasCallStack)
 import GHC.Generics as Imports (Generic)
