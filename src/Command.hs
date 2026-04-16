@@ -32,7 +32,7 @@ import System.Process hiding (readProcess, callProcess)
 import System.Process qualified as Process
 
 newtype Concurrency = Concurrency Int
-  deriving newtype (Eq, Show, Read, Num)
+  deriving newtype (Eq, Ord, Show, Read, Num)
 
 eval :: String -> IO Text
 eval command = run "bash" ["-c", command]

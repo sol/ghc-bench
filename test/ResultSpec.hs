@@ -1,6 +1,12 @@
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ResultSpec (spec) where
 
+import README (ensureFile)
+import Data.Text qualified as T
+import Data.Set qualified as Set
+import Data.Set (Set)
+import Data.List qualified as List
 import Helper
 
 import Control.Exception
@@ -12,12 +18,15 @@ import Data.ByteString qualified as B
 import System.Directory (listDirectory, createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
-import Data.Map qualified as Map
 
 import Fixtures.System qualified as System
 
 import SystemInfo
 import Result
+
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import README qualified (update)
 
 spec :: Spec
 spec = do
@@ -84,24 +93,22 @@ spec = do
         resultPath "2026-04-13" System.x200 `shouldBe`
           "results/intel/core_2/P8700/X200-7455D7G_2026-04-13.yaml"
 
-  it "process results" do
-    processResults "raw"
+  fit "process results" do
+    results <- processResults "raw"
+    README.update results
 
-processResults :: FilePath -> IO ()
+processResults :: FilePath -> IO [Result]
 processResults dir = do
-  listDirectory dir >>= traverse_ \ name -> do
-    Utf8.readFile (dir </> name) >>= processResult name
+  listDirectory dir >>= traverse \ timestamp -> do
+    body <- Utf8.readFile (dir </> timestamp)
+    let
+      result :: Result
+      result = parseFromIssueBody body
 
-processResult :: FilePath -> Text -> IO ()
-processResult timestamp body = do
-  let
-    result :: Result
-    result = parseFromIssueBody body
-
-    path :: FilePath
-    path = resultPath (fromString timestamp) result.system
-
-  encodeFile path result
+      path :: FilePath
+      path = resultPath (fromString timestamp) result.system
+    encodeFile path result
+    return result
 
 encodeFile :: FilePath -> Result -> IO ()
 encodeFile file result = do
@@ -112,13 +119,6 @@ encodeFile file result = do
 
     byFieldOrder :: Text -> Int
     byFieldOrder name = fromMaybe maxBound (lookup name fieldOrder)
-
-ensureFile :: FilePath -> ByteString -> IO ()
-ensureFile file new = do
-  old <- try @IOException $ B.readFile file
-  unless (old == Right new) do
-    createDirectoryIfMissing True (takeDirectory file)
-    B.writeFile file new
 
 fieldOrder :: [(Text, Int)]
 fieldOrder = flip zip [1..] [

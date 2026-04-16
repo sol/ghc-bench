@@ -5,6 +5,10 @@ module Result (
 , Concurrency(..)
 , parseFromIssueBody
 , resultPath
+, basePath
+, cpuName
+
+, formatTime
 #ifdef TEST
 , issueTitle
 #endif
@@ -77,7 +81,7 @@ issueUrl result = base <> renderQuery [
       ]
 
 issueTitle :: Int -> SystemInfo -> Text
-issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", description, "-", cpu]
+issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", description, "-", cpu]
   where
     description :: Text
     description = unwords case (system.vendor, system.product.name) of
@@ -87,10 +91,18 @@ issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", descr
       (vendor, name) -> [vendor, name]
 
     cpu :: Text
-    cpu = case system.cpu.vendor of
-      Just "GenuineIntel" -> case T.breakOn " @ " system.cpu.name of
-        (name, _) -> T.replace "(TM)" "" $ T.replace "(R)" "" name
-      _ -> system.cpu.name
+    cpu = cpuName system.cpu
+
+cpuName :: Cpu -> Text
+cpuName cpu = case cpu.vendor of
+  Just "GenuineIntel" -> case T.breakOn " @ " cpu.name of
+    (name, _) -> unwords . filter (/= "CPU") . words . T.replace "(TM)" " " $ tryStripPrefix "11th Gen " $ T.replace "(R)" "" name
+  _ -> cpu.name
+
+formatTime :: Int -> Text
+formatTime seconds = mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
+  where
+    (m, s) = seconds `divMod` 60
 
 unknown :: Text -> Bool
 unknown = (== "To Be Filled By O.E.M.")
@@ -179,20 +191,10 @@ newtype Timestamp = Timestamp String
   deriving newtype (Eq, Show, Read, IsString)
 
 resultPath :: Timestamp -> SystemInfo -> FilePath
-resultPath (Timestamp timestamp) system = joinPath $ sanitizePathComponents path
+resultPath (Timestamp timestamp) system = joinPathComponents path
   where
     path :: [Text]
-    path = "results" : vendor : cpu ++  [file]
-
-    vendor :: Text
-    vendor = case system.cpu.vendor of
-      Just "GenuineIntel" -> "intel"
-      Just "AuthenticAMD" -> "amd"
-      Just name -> name
-      Nothing -> "unknown"
-
-    cpu :: [Text]
-    cpu = cpuToPathComponents system.cpu
+    path = resultPath_ system.cpu ++  [file]
 
     file :: Text
     file = model <> "_" <> pack timestamp <> ".yaml"
@@ -202,6 +204,22 @@ resultPath (Timestamp timestamp) system = joinPath $ sanitizePathComponents path
       ("LENOVO", _) -> [tryStripPrefix "ThinkPad " system.product.version, system.product.name]
       (_, unknown -> True) -> [system.board.vendor, system.board.name]
       (_, name) -> [name]
+
+joinPathComponents :: [Text] -> String
+joinPathComponents = joinPath . sanitizePathComponents
+
+basePath :: Cpu -> String
+basePath = joinPathComponents . resultPath_
+
+resultPath_ :: Cpu -> [Text]
+resultPath_ cpu = "results" : vendor : cpuToPathComponents cpu
+  where
+    vendor :: Text
+    vendor = case cpu.vendor of
+      Just "GenuineIntel" -> "intel"
+      Just "AuthenticAMD" -> "amd"
+      Just name -> name
+      Nothing -> "unknown"
 
 cpuToPathComponents :: Cpu -> [Text]
 cpuToPathComponents cpu = case (cpu.vendor, cpu.family, cpu.model, cpu.stepping) of
