@@ -2,19 +2,24 @@ module Benchmark.BuildCabalPackage (run) where
 
 import Benchmark.Util
 
-run :: String -> FilePath -> Concurrency -> FilePath -> IO Int
+run :: String -> FilePath -> Concurrency -> FilePath -> IO [(String, Int)]
 run package ghc concurrency sandbox = do
   callWith (chdir sandbox) "cabal" ["unpack", package, indexState]
   build ghc concurrency (sandbox </> package)
 
-build :: FilePath -> Concurrency -> FilePath -> IO Int
+build :: FilePath -> Concurrency -> FilePath -> IO [(String, Int)]
 build ghc concurrency dir = do
   cabal "user-config" ["init"]
-  cabal "build" ["--only-dependencies", "--only-download"]
-  measure do
-    cabal "build" ["--only-dependencies"]
-    cabal "build" []
+  downloadDependencies
+  traverse (traverse measure) [
+      ("dependencies", installDependencies)
+    , ("build", buildPackage)
+    ]
   where
+    downloadDependencies = cabal "build" ["--only-dependencies", "--only-download"]
+    installDependencies = cabal "build" ["--only-dependencies"]
+    buildPackage = cabal "build" []
+
     cabal :: FilePath -> [FilePath] -> IO ()
     cabal command = callWith (chdir dir) "cabal" . case command of
       "user-config" -> mappend globalArgs

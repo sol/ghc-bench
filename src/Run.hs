@@ -40,7 +40,7 @@ sourceTarball = Tarball {
   }
 
 cabalPackage :: FilePath
-cabalPackage = "hspec-2.11.17"
+cabalPackage = "hedgehog-1.7"
 
 main :: [String] -> IO ()
 main args = do
@@ -50,21 +50,24 @@ main args = do
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- nproc
-  times <- do
+  times <- map (first pack) <$> do
 
     let
-      benchmarkBuildGhc :: IO (Text, Int)
-      benchmarkBuildGhc = (,) (pack ghc) <$> do
+      benchmarkBuildGhc :: IO (String, Int)
+      benchmarkBuildGhc = (,) ghc <$> do
         withTempDirectory baseDir "build" $ BuildGhc.run sourceTarball stage0 concurrency
 
-      benchmarkBuildCabalPackage :: IO (Text, Int)
-      benchmarkBuildCabalPackage = (,) (pack cabalPackage) <$> do
+      benchmarkBuildCabalPackage :: IO [(String, Int)]
+      benchmarkBuildCabalPackage = map (first prependPackageName) <$> do
         withTempDirectory baseDir "build" $ BuildCabalPackage.run cabalPackage ghc concurrency
+        where
+          prependPackageName :: String -> String
+          prependPackageName label = mconcat [cabalPackage, "-", label]
 
     case args of
-      [] -> sequence [benchmarkBuildGhc, benchmarkBuildCabalPackage]
+      [] -> (:) <$> benchmarkBuildGhc <*> benchmarkBuildCabalPackage
       ["ghc"] -> return <$> benchmarkBuildGhc
-      ["cabal"] -> return <$> benchmarkBuildCabalPackage
+      ["cabal"] -> benchmarkBuildCabalPackage
       ["info"] -> return [("info", 0)]
       _ -> die "usage: ghc-bench [info]"
 
