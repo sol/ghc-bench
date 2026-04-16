@@ -50,11 +50,27 @@ main args = do
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- nproc
-  time <- withTempDirectory baseDir "build" $ \ dir -> case args of
-    [] -> BuildGhc.run sourceTarball stage0 concurrency dir
-    ["cabal"] -> BuildCabalPackage.run cabalPackage ghc concurrency dir
-    ["info"] -> return 0
-    _ -> die "usage: ghc-bench [info]"
-  putStrLn $ "\nBuild time: " <> show time <> "s"
+  times <- do
+
+    let
+      benchmarkBuildGhc :: IO (Text, Int)
+      benchmarkBuildGhc = (,) (pack ghc) <$> do
+        withTempDirectory baseDir "build" $ BuildGhc.run sourceTarball stage0 concurrency
+
+      benchmarkBuildCabalPackage :: IO (Text, Int)
+      benchmarkBuildCabalPackage = (,) (pack cabalPackage) <$> do
+        withTempDirectory baseDir "build" $ BuildCabalPackage.run cabalPackage ghc concurrency
+
+    case args of
+      [] -> sequence [benchmarkBuildGhc, benchmarkBuildCabalPackage]
+      ["ghc"] -> return <$> benchmarkBuildGhc
+      ["cabal"] -> return <$> benchmarkBuildCabalPackage
+      ["info"] -> return [("info", 0)]
+      _ -> die "usage: ghc-bench [info]"
+
+  putStrLn "\ntimes:"
+  for_ times \ (name, time) -> do
+    putStrLn $ "  " <> name <> ": " <> (show time)
+
   putStrLn ""
   Result.submit Result {..}

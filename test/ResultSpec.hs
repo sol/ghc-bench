@@ -5,13 +5,14 @@ import Helper
 
 import Control.Exception
 import Data.Ord (comparing)
-import Data.Yaml (ToJSON)
+import Data.Yaml (ToJSON(..), object, (.=))
 import Data.Yaml.Pretty qualified as Yaml
 import Data.ByteString (ByteString)
 import Data.ByteString qualified as B
 import System.Directory (listDirectory, createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
+import Data.Map qualified as Map
 
 import Fixtures.System qualified as System
 
@@ -43,19 +44,19 @@ spec = do
     let
       fixtures = [
           ("raw/2026-04-12T16:01:13Z", Result {
-              time = 526
+              times = [("ghc", 526)]
             , concurrency = 20
             , system = System.i10900K_desktop
             }
           )
         , ("raw/2026-04-12T13:37:10Z", Result {
-              time = 715
+              times = [("ghc", 715)]
             , concurrency = 8
             , system = System.dell_xps
             }
           )
         , ("raw/2026-04-12T17:38:23Z", Result {
-              time = 3013
+              times = [("ghc", 3013)]
             , concurrency = 2
             , system = System.x200
             }
@@ -121,7 +122,7 @@ ensureFile file new = do
 
 fieldOrder :: [(Text, Int)]
 fieldOrder = flip zip [1..] [
-    "time"
+    "times"
   , "concurrency"
   , "os"
   , "arch"
@@ -141,7 +142,13 @@ fieldOrder = flip zip [1..] [
   , "ram"
   ]
 
-instance ToJSON Result
+instance ToJSON Result where
+  toJSON Result{..} = object [
+      "times" .= Map.fromList times
+    , "concurrency" .= concurrency
+    , "system" .= system
+    ]
+
 deriving newtype instance ToJSON Concurrency
 instance ToJSON SystemInfo
 instance ToJSON Product

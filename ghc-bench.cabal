@@ -98,6 +98,7 @@ test-suite spec
   build-depends:
       base ==4.*
     , bytestring
+    , containers
     , directory
     , filepath
     , hspec ==2.*
