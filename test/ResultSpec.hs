@@ -44,19 +44,19 @@ spec = do
     let
       fixtures = [
           ("raw/2026-04-12T16:01:13Z", Result {
-              times = [("ghc", 526)]
+              times = [("ghc-9.12.4", 526)]
             , concurrency = 20
             , system = System.i10900K_desktop
             }
           )
         , ("raw/2026-04-12T13:37:10Z", Result {
-              times = [("ghc", 715)]
+              times = [("ghc-9.12.4", 715)]
             , concurrency = 8
             , system = System.dell_xps
             }
           )
         , ("raw/2026-04-12T17:38:23Z", Result {
-              times = [("ghc", 3013)]
+              times = [("ghc-9.12.4", 3013)]
             , concurrency = 2
             , system = System.x200
             }

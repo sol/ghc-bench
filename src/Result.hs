@@ -40,7 +40,7 @@ issueUrl result = base <> renderQuery [
     ("template", "benchmark-result.yml")
   , ("title", issueTitle (sum $ map snd result.times) system)
 
-  , ("time", formatTimes result.times)
+  , ("times", formatTimes result.times)
   , ("concurrency", show result.concurrency)
 
   , ("os", system.os)
@@ -100,7 +100,7 @@ renderQuery = renderSimpleQuery True . map (fmap encodeUtf8)
 
 parseFromIssueBody :: Text -> Result
 parseFromIssueBody markdown = Result {
-    times = parseTimes $ get "Build time (seconds)"
+    times = parseTimes $ get "Build times (seconds)"
   , concurrency = Concurrency $ int "Used number of threads"
   , system
   }

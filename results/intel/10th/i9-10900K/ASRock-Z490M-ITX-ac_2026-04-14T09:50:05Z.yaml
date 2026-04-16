@@ -1,5 +1,5 @@
 times:
-  ghc: 523
+  ghc-9.12.4: 523
 concurrency: 20
 system:
   os: Arch Linux
