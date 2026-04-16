@@ -75,6 +75,7 @@ test-suite spec
       CommandSpec
       Fixtures.System
       Helper
+      README
       ResultSpec
       SystemInfoSpec
   hs-source-dirs:

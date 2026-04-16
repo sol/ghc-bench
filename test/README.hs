@@ -1,22 +1,18 @@
 module README where
 
+import Data.Functor
 import Data.Text qualified as T
 import Data.Set qualified as Set
-import Data.Set (Set)
 import Data.List qualified as List
 import Helper
 
 import Control.Exception
-import Data.Ord (comparing)
-import Data.Yaml (ToJSON(..), object, (.=))
-import Data.Yaml.Pretty qualified as Yaml
 import Data.ByteString (ByteString)
 import Data.ByteString qualified as B
-import System.Directory (listDirectory, createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
 
-import Fixtures.System qualified as System
 
 import SystemInfo
 import Result
@@ -101,7 +97,23 @@ mdTable results = unlines $ map joinColumns xxx
     aggregated = aggregateResults results
 
     labels :: [Label]
-    labels = Set.toList . mconcat . map Map.keysSet $ Map.elems aggregated
+    labels = sortLabels . Set.toList . mconcat . map Map.keysSet $ Map.elems aggregated
+
+    sortLabels :: [Label] -> [Label]
+    sortLabels = List.sortOn p
+      where
+        p :: Label -> Maybe (Int, Text)
+        p label = ($> label) <$> List.find pp labelOrder
+          where
+            pp :: (Int, Text) -> Bool
+            pp (_, ppp) = T.isSuffixOf ppp label
+
+        labelOrder :: [(Int, Text)]
+        labelOrder = zip [0..] [
+            "ghc"
+          , "-dependencies"
+          , "-build"
+          ]
 
 ensureFile :: FilePath -> ByteString -> IO ()
 ensureFile file new = do
@@ -112,8 +124,11 @@ ensureFile file new = do
 
 formatLabel :: Text -> Text
 formatLabel = \ case
-  "ghc-9.12.4" -> "building GHC 9.12.4 with `--flavour=quickest`"
+  "ghc-9.12.4" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
+  "hedgehog-1.7-dependencies" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
+  "hedgehog-1.7-build" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
   label -> label
+
 
 formatCpu :: Cpu -> Text
 formatCpu cpu = mconcat ["[", cpuName cpu, "](", pack $ basePath cpu,  ")"]

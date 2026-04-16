@@ -1,22 +1,13 @@
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ResultSpec (spec) where
 
 import README (ensureFile)
-import Data.Text qualified as T
-import Data.Set qualified as Set
-import Data.Set (Set)
-import Data.List qualified as List
 import Helper
 
-import Control.Exception
 import Data.Ord (comparing)
 import Data.Yaml (ToJSON(..), object, (.=))
 import Data.Yaml.Pretty qualified as Yaml
-import Data.ByteString (ByteString)
-import Data.ByteString qualified as B
-import System.Directory (listDirectory, createDirectoryIfMissing)
-import System.FilePath (takeDirectory)
+import System.Directory (listDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
 
 import Fixtures.System qualified as System
@@ -24,7 +15,6 @@ import Fixtures.System qualified as System
 import SystemInfo
 import Result
 
-import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 import README qualified (update)
 
@@ -35,19 +25,19 @@ spec = do
       it "creates a descriptive issue title" do
         issueTitle 0 System.i10900K_desktop `shouldBe`
 
-          "[result] 0s - desktop computer - Intel Core i9-10900K CPU"
+          "[result] 0s - desktop computer - Intel Core i9-10900K"
 
     context "with a laptop system" do
       it "creates a descriptive issue title" do
         issueTitle 0 System.dell_xps `shouldBe`
 
-          "[result] 0s - Dell Inc. XPS 13 9310 - 11th Gen Intel Core i7-1165G7"
+          "[result] 0s - Dell Inc. XPS 13 9310 - Intel Core i7-1165G7"
 
     context "with a LENOVO ThinkPad" do
       it "creates a descriptive issue title" do
         issueTitle 0 System.x200 `shouldBe`
 
-          "[result] 0s - LENOVO ThinkPad X200 - Intel Core2 Duo CPU     P8700 "
+          "[result] 0s - LENOVO ThinkPad X200 - Intel Core 2 Duo P8700"
 
   describe "parseFromIssueBody" do
     let
@@ -93,7 +83,7 @@ spec = do
         resultPath "2026-04-13" System.x200 `shouldBe`
           "results/intel/core_2/P8700/X200-7455D7G_2026-04-13.yaml"
 
-  fit "process results" do
+  it "process results" do
     results <- processResults "raw"
     README.update results
 

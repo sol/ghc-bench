@@ -5,10 +5,10 @@ module Result (
 , Concurrency(..)
 , parseFromIssueBody
 , resultPath
-, basePath
-, cpuName
-
 , formatTime
+, cpuName
+, basePath
+
 #ifdef TEST
 , issueTitle
 #endif
@@ -81,7 +81,7 @@ issueUrl result = base <> renderQuery [
       ]
 
 issueTitle :: Int -> SystemInfo -> Text
-issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", description, "-", cpu]
+issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", description, "-", cpuName system.cpu]
   where
     description :: Text
     description = unwords case (system.vendor, system.product.name) of
@@ -90,19 +90,23 @@ issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", descri
       (vendor, unknown -> True) -> [vendor, system.product.category]
       (vendor, name) -> [vendor, name]
 
-    cpu :: Text
-    cpu = cpuName system.cpu
-
 cpuName :: Cpu -> Text
 cpuName cpu = case cpu.vendor of
   Just "GenuineIntel" -> case T.breakOn " @ " cpu.name of
-    (name, _) -> unwords . filter (/= "CPU") . words . T.replace "(TM)" " " $ tryStripPrefix "11th Gen " $ T.replace "(R)" "" name
+    (name, _) ->
+        unwords
+      . filter (/= "CPU")
+      . words
+      . tryStripPrefix "11th Gen "
+      . T.replace "(R)" ""
+      . T.replace "(TM)" " "
+      $ name
   _ -> cpu.name
 
 formatTime :: Int -> Text
-formatTime seconds = mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
-  where
-    (m, s) = seconds `divMod` 60
+formatTime seconds = case seconds `divMod` 60 of
+  (0, s) -> show s <> "s"
+  (m, s) -> mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
 
 unknown :: Text -> Bool
 unknown = (== "To Be Filled By O.E.M.")
@@ -205,9 +209,6 @@ resultPath (Timestamp timestamp) system = joinPathComponents path
       (_, unknown -> True) -> [system.board.vendor, system.board.name]
       (_, name) -> [name]
 
-joinPathComponents :: [Text] -> String
-joinPathComponents = joinPath . sanitizePathComponents
-
 basePath :: Cpu -> String
 basePath = joinPathComponents . resultPath_
 
@@ -227,6 +228,9 @@ cpuToPathComponents cpu = case (cpu.vendor, cpu.family, cpu.model, cpu.stepping)
   (Just "GenuineIntel", Just "6", Just "140", Just "1") -> ["11th", T.take 9 $ T.drop 27 cpu.name]
   (Just "GenuineIntel", Just "6", Just "23", Just "10") -> ["core_2", T.take 5 $ T.drop 31 cpu.name]
   _ -> ["unknown", T.replace " " "_" cpu.name]
+
+joinPathComponents :: [Text] -> String
+joinPathComponents = joinPath . sanitizePathComponents
 
 sanitizePathComponent :: Text -> FilePath
 sanitizePathComponent component = case sanitize component of
