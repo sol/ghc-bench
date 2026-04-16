@@ -1,4 +1,5 @@
-time: 526
+times:
+  ghc: 526
 concurrency: 20
 system:
   os: Arch Linux

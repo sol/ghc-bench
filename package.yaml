@@ -49,4 +49,5 @@ tests:
     dependencies:
       - hspec == 2.*
       - yaml
+      - containers
       - silently

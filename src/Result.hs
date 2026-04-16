@@ -25,7 +25,7 @@ base :: ByteString
 base = "https://github.com/sol/ghc-bench/issues/new"
 
 data Result = Result {
-  time :: Int
+  times :: [(Text, Int)]
 , concurrency :: Concurrency
 , system :: SystemInfo
 } deriving (Eq, Show, Generic)
@@ -38,9 +38,9 @@ submit result = do
 issueUrl :: Result -> ByteString
 issueUrl result = base <> renderQuery [
     ("template", "benchmark-result.yml")
-  , ("title", issueTitle result.time system)
+  , ("title", issueTitle (sum $ map snd result.times) system)
 
-  , ("time", show result.time)
+  , ("time", formatTimes result.times)
   , ("concurrency", show result.concurrency)
 
   , ("os", system.os)
@@ -100,7 +100,7 @@ renderQuery = renderSimpleQuery True . map (fmap encodeUtf8)
 
 parseFromIssueBody :: Text -> Result
 parseFromIssueBody markdown = Result {
-    time = int "Build time (seconds)"
+    times = parseTimes $ get "Build time (seconds)"
   , concurrency = Concurrency $ int "Used number of threads"
   , system
   }
@@ -164,6 +164,16 @@ parseFromIssueBody markdown = Result {
         parseSection = bimap strip strip . T.break (== '\n') >>> \ case
           (key, "_No response_") -> (key, "")
           (key, value) -> (key, value)
+
+formatTimes :: [(Text, Int)] -> Text
+formatTimes = unwords . map \ case
+  (name, time) -> mconcat [name, ":", show time]
+
+parseTimes :: Text -> [(Text, Int)]
+parseTimes = words >>> map parseTime
+  where
+    parseTime :: Text -> (Text, Int)
+    parseTime = T.breakOn ":" >>> fmap (read . T.drop 1)
 
 newtype Timestamp = Timestamp String
   deriving newtype (Eq, Show, Read, IsString)
