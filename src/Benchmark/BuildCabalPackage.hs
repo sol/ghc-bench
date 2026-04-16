@@ -12,7 +12,7 @@ build ghc concurrency dir = do
   cabal "user-config" ["init"]
   downloadDependencies
   traverse (traverse measure) [
-    ("dependencies", installDependencies)
+      ("dependencies", installDependencies)
     , ("build", buildPackage)
     ]
   where
