@@ -18,9 +18,9 @@ body:
         - `ghc-bench` does not collect any information that uniquely identifies a system.  If you still want to redact some information for privacy reasons then please replace it with `[redacted]`.
 
   - type: input
-    id: time
+    id: times
     attributes:
-      label: Build time (seconds)
+      label: Build times (seconds)
     validations:
       required: true
 

@@ -1,5 +1,5 @@
 times:
-  ghc: 3013
+  ghc-9.12.4: 3013
 concurrency: 2
 system:
   os: Debian GNU/Linux

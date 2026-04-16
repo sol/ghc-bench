@@ -2,9 +2,9 @@
 
 _No response_
 
-### Build time (seconds)
+### Build times (seconds)
 
-ghc:715
+ghc-9.12.4:715
 
 ### Used number of threads
 
