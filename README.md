@@ -2,7 +2,7 @@
 
 ## Benchmark results
 
-| CPU | building GHC 9.12.4 with `--flavour=quickest` | hedgehog-1.7-build | hedgehog-1.7-dependencies |
+| CPU | building GHC 9.12.4 | hedgehog-1.7-build | hedgehog-1.7-dependencies |
 | --- | --- | --- | --- |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 13s (0m 13s) | 28s (0m 28s) |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - |
