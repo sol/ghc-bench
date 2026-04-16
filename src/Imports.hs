@@ -5,7 +5,7 @@ import Prelude as Imports hiding (read, show, lines, unlines, words, unwords, er
 import Data.Maybe as Imports
 
 import Data.String as Imports (IsString(..))
-import Data.Functor as Imports (void, (<&>))
+import Data.Functor as Imports hiding (unzip)
 import Data.Bifunctor as Imports (Bifunctor(..))
 import Control.Arrow as Imports ((>>>))
 import Control.Monad as Imports (when, unless, (>=>))

@@ -2,17 +2,11 @@
 
 ## Benchmark results
 
-| CPU | building GHC 9.12.4 with `--flavour=quickest` |
-| --- | --- |
-| Intel Core Ultra 7 270K Plus | (no results yet) |
-| AMD Ryzen AI Max+ 395 | (no results yet) |
-| AMD Ryzen 7 9700X | (no results yet) |
-| Intel Core Ultra 7 255H | (no results yet) |
-| AMD Ryzen AI 7 350 | (no results yet) |
-| Intel Core Ultra 7 258V | (no results yet) |
-| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) |
-| [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) |
-| [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) |
+| CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) |
+| --- | --- | --- | --- |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s |
+| [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - |
+| [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - |
 
 ## About
 `ghc-bench` measures how well a system performs on Haskell development workloads compared to other systems.

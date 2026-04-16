@@ -48,6 +48,7 @@ tests:
     source-dirs: test
     dependencies:
       - hspec == 2.*
+      - aeson
       - yaml
       - containers
       - silently

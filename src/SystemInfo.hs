@@ -90,7 +90,7 @@ data Cpu = Cpu {
 , family :: Maybe Text
 , model :: Maybe Text
 , stepping :: Maybe Text
-} deriving (Eq, Show, Generic)
+} deriving (Eq, Ord, Show, Generic)
 
 getCpuInfo :: IO Cpu
 getCpuInfo = do

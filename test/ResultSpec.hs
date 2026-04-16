@@ -3,18 +3,17 @@ module ResultSpec (spec) where
 
 import Helper
 
-import Control.Exception
 import Data.Ord (comparing)
+import Data.Aeson (ToJSONKey)
 import Data.Yaml (ToJSON(..), object, (.=))
 import Data.Yaml.Pretty qualified as Yaml
-import Data.ByteString (ByteString)
-import Data.ByteString qualified as B
-import System.Directory (listDirectory, createDirectoryIfMissing)
-import System.FilePath (takeDirectory)
+import System.Directory (listDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
-import Data.Map qualified as Map
+import Data.Map.Strict qualified as Map
 
 import Fixtures.System qualified as System
+import README (ensureFile)
+import README qualified (update)
 
 import SystemInfo
 import Result
@@ -26,19 +25,19 @@ spec = do
       it "creates a descriptive issue title" do
         issueTitle 0 System.i10900K_desktop `shouldBe`
 
-          "[result] 0s - desktop computer - Intel Core i9-10900K CPU"
+          "[result] 0s - desktop computer - Intel Core i9-10900K"
 
     context "with a laptop system" do
       it "creates a descriptive issue title" do
         issueTitle 0 System.dell_xps `shouldBe`
 
-          "[result] 0s - Dell Inc. XPS 13 9310 - 11th Gen Intel Core i7-1165G7"
+          "[result] 0s - Dell Inc. XPS 13 9310 - Intel Core i7-1165G7"
 
     context "with a LENOVO ThinkPad" do
       it "creates a descriptive issue title" do
         issueTitle 0 System.x200 `shouldBe`
 
-          "[result] 0s - LENOVO ThinkPad X200 - Intel Core2 Duo CPU     P8700 "
+          "[result] 0s - LENOVO ThinkPad X200 - Intel Core 2 Duo P8700"
 
   describe "parseFromIssueBody" do
     let
@@ -85,23 +84,21 @@ spec = do
           "results/intel/core_2/P8700/X200-7455D7G_2026-04-13.yaml"
 
   it "process results" do
-    processResults "raw"
+    results <- processResults "raw"
+    README.update results
 
-processResults :: FilePath -> IO ()
+processResults :: FilePath -> IO [Result]
 processResults dir = do
-  listDirectory dir >>= traverse_ \ name -> do
-    Utf8.readFile (dir </> name) >>= processResult name
+  listDirectory dir >>= traverse \ timestamp -> do
+    body <- Utf8.readFile (dir </> timestamp)
+    let
+      result :: Result
+      result = parseFromIssueBody body
 
-processResult :: FilePath -> Text -> IO ()
-processResult timestamp body = do
-  let
-    result :: Result
-    result = parseFromIssueBody body
-
-    path :: FilePath
-    path = resultPath (fromString timestamp) result.system
-
-  encodeFile path result
+      path :: FilePath
+      path = resultPath (fromString timestamp) result.system
+    encodeFile path result
+    return result
 
 encodeFile :: FilePath -> Result -> IO ()
 encodeFile file result = do
@@ -112,13 +109,6 @@ encodeFile file result = do
 
     byFieldOrder :: Text -> Int
     byFieldOrder name = fromMaybe maxBound (lookup name fieldOrder)
-
-ensureFile :: FilePath -> ByteString -> IO ()
-ensureFile file new = do
-  old <- try @IOException $ B.readFile file
-  unless (old == Right new) do
-    createDirectoryIfMissing True (takeDirectory file)
-    B.writeFile file new
 
 fieldOrder :: [(Text, Int)]
 fieldOrder = flip zip [1..] [
@@ -149,6 +139,8 @@ instance ToJSON Result where
     , "system" .= system
     ]
 
+deriving newtype instance ToJSONKey Label
+deriving newtype instance ToJSON Seconds
 deriving newtype instance ToJSON Concurrency
 instance ToJSON SystemInfo
 instance ToJSON Product

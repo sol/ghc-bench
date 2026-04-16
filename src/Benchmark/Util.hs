@@ -4,6 +4,8 @@ module Benchmark.Util (
   module Imports
 
 , Concurrency
+
+, Seconds(..)
 , measure
 
 , callWith
@@ -18,10 +20,13 @@ import GHC.Clock (getMonotonicTimeNSec)
 
 import Command
 
-measure :: IO () -> IO Int
+newtype Seconds = Seconds Int
+  deriving newtype (Eq, Show, Num, Ord, Bounded)
+
+measure :: IO () -> IO Seconds
 measure action = do
   start <- getMonotonicTimeNSec
   action
   end <- getMonotonicTimeNSec
   let dtSeconds = fromIntegral (end - start) / 1e9 :: Double
-  pure (round dtSeconds)
+  pure . Seconds $ round dtSeconds

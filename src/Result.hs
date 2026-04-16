@@ -2,9 +2,15 @@
 module Result (
   submit
 , Result(..)
+, Label(..)
+, Seconds(..)
 , Concurrency(..)
 , parseFromIssueBody
 , resultPath
+, formatTime
+, cpuName
+, basePath
+
 #ifdef TEST
 , issueTitle
 #endif
@@ -18,14 +24,18 @@ import Data.ByteString.Char8 (ByteString, putStrLn)
 import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
+import Benchmark.Util (Seconds(..))
 import Command (Concurrency(..))
 import SystemInfo
 
 base :: ByteString
 base = "https://github.com/sol/ghc-bench/issues/new"
 
+newtype Label = Label Text
+  deriving newtype (Eq, Show, Ord, IsString, Semigroup, Monoid)
+
 data Result = Result {
-  times :: [(Text, Int)]
+  times :: [(Label, Seconds)]
 , concurrency :: Concurrency
 , system :: SystemInfo
 } deriving (Eq, Show, Generic)
@@ -76,8 +86,8 @@ issueUrl result = base <> renderQuery [
       , fromMaybe "unknown" system.cpu.stepping
       ]
 
-issueTitle :: Int -> SystemInfo -> Text
-issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", description, "-", cpu]
+issueTitle :: Seconds -> SystemInfo -> Text
+issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", description, "-", cpuName system.cpu]
   where
     description :: Text
     description = unwords case (system.vendor, system.product.name) of
@@ -86,11 +96,23 @@ issueTitle seconds system = unwords ["[result]", show seconds <> "s", "-", descr
       (vendor, unknown -> True) -> [vendor, system.product.category]
       (vendor, name) -> [vendor, name]
 
-    cpu :: Text
-    cpu = case system.cpu.vendor of
-      Just "GenuineIntel" -> case T.breakOn " @ " system.cpu.name of
-        (name, _) -> T.replace "(TM)" "" $ T.replace "(R)" "" name
-      _ -> system.cpu.name
+cpuName :: Cpu -> Text
+cpuName cpu = case cpu.vendor of
+  Just "GenuineIntel" -> case T.breakOn " @ " cpu.name of
+    (name, _) ->
+        unwords
+      . filter (/= "CPU")
+      . words
+      . tryStripPrefix "11th Gen "
+      . T.replace "(R)" ""
+      . T.replace "(TM)" " "
+      $ name
+  _ -> cpu.name
+
+formatTime :: Seconds -> Text
+formatTime (Seconds seconds) = case seconds `divMod` 60 of
+  (0, s) -> show s <> "s"
+  (m, s) -> mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
 
 unknown :: Text -> Bool
 unknown = (== "To Be Filled By O.E.M.")
@@ -165,34 +187,24 @@ parseFromIssueBody markdown = Result {
           (key, "_No response_") -> (key, "")
           (key, value) -> (key, value)
 
-formatTimes :: [(Text, Int)] -> Text
+formatTimes :: [(Label, Seconds)] -> Text
 formatTimes = unwords . map \ case
-  (name, time) -> mconcat [name, ":", show time]
+  (Label name, time) -> mconcat [name, ":", show time]
 
-parseTimes :: Text -> [(Text, Int)]
+parseTimes :: Text -> [(Label, Seconds)]
 parseTimes = words >>> map parseTime
   where
-    parseTime :: Text -> (Text, Int)
-    parseTime = T.breakOn ":" >>> fmap (read . T.drop 1)
+    parseTime :: Text -> (Label, Seconds)
+    parseTime = T.breakOn ":" >>> bimap Label (Seconds . read . T.drop 1)
 
 newtype Timestamp = Timestamp String
   deriving newtype (Eq, Show, Read, IsString)
 
 resultPath :: Timestamp -> SystemInfo -> FilePath
-resultPath (Timestamp timestamp) system = joinPath $ sanitizePathComponents path
+resultPath (Timestamp timestamp) system = joinPathComponents path
   where
     path :: [Text]
-    path = "results" : vendor : cpu ++  [file]
-
-    vendor :: Text
-    vendor = case system.cpu.vendor of
-      Just "GenuineIntel" -> "intel"
-      Just "AuthenticAMD" -> "amd"
-      Just name -> name
-      Nothing -> "unknown"
-
-    cpu :: [Text]
-    cpu = cpuToPathComponents system.cpu
+    path = basePathComponents system.cpu ++  [file]
 
     file :: Text
     file = model <> "_" <> pack timestamp <> ".yaml"
@@ -203,12 +215,28 @@ resultPath (Timestamp timestamp) system = joinPath $ sanitizePathComponents path
       (_, unknown -> True) -> [system.board.vendor, system.board.name]
       (_, name) -> [name]
 
+basePath :: Cpu -> String
+basePath = joinPathComponents . basePathComponents
+
+basePathComponents :: Cpu -> [Text]
+basePathComponents cpu = "results" : vendor : cpuToPathComponents cpu
+  where
+    vendor :: Text
+    vendor = case cpu.vendor of
+      Just "GenuineIntel" -> "intel"
+      Just "AuthenticAMD" -> "amd"
+      Just name -> name
+      Nothing -> "unknown"
+
 cpuToPathComponents :: Cpu -> [Text]
 cpuToPathComponents cpu = case (cpu.vendor, cpu.family, cpu.model, cpu.stepping) of
   (Just "GenuineIntel", Just "6", Just "165", Just "5") -> ["10th", T.take 9 $ T.drop 18 cpu.name]
   (Just "GenuineIntel", Just "6", Just "140", Just "1") -> ["11th", T.take 9 $ T.drop 27 cpu.name]
   (Just "GenuineIntel", Just "6", Just "23", Just "10") -> ["core_2", T.take 5 $ T.drop 31 cpu.name]
   _ -> ["unknown", T.replace " " "_" cpu.name]
+
+joinPathComponents :: [Text] -> String
+joinPathComponents = joinPath . sanitizePathComponents
 
 sanitizePathComponent :: Text -> FilePath
 sanitizePathComponent component = case sanitize component of
