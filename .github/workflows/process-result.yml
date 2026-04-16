@@ -34,6 +34,7 @@ jobs:
           key: ${{ env.key }}-${{ hashFiles('dist-newstyle/cache/plan.json') }}
           restore-keys: ${{ env.key }}-
 
+      - run: echo "${{ github.event.issue.body }}" > "raw/${{ github.event.issue.created_at }}"
       - run: cabal test
 
       - name: Create branch
