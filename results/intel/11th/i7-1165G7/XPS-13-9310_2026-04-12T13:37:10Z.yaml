@@ -1,5 +1,5 @@
 times:
-  ghc-9.12.4: 715
+  ghc-9.12.4-build: 715
 concurrency: 8
 system:
   os: Arch Linux

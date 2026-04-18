@@ -1,5 +1,5 @@
 times:
-  ghc-9.12.4: 526
+  ghc-9.12.4-build: 526
 concurrency: 20
 system:
   os: Arch Linux

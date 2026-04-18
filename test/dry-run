@@ -1,0 +1,38 @@
+
+############################################
+# With a fresh temporary working directory #
+############################################
+
+cd <sandbox>
+export GHC=/path/to/ghc-9.12.4
+
+# Ensure that /tmp/ghc-bench/ghc-9.12.4-src.tar.gz exists; download if necessary.
+# url: https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-src.tar.gz
+# sha256: df71d96169056d3a6d7ec17498864cbdd5511bda196440dc38a692133833dfa4
+
+tar -xf /tmp/ghc-bench/ghc-9.12.4-src.tar.gz
+cd ghc-9.12.4
+./configure
+hadrian/build --help
+
+# MEASURE ghc-9.12.4-build
+hadrian/build -j20 --flavour=quickest
+
+
+############################################
+# With a fresh temporary working directory #
+############################################
+
+cd <sandbox>
+cabal unpack hedgehog-1.7 --index-state=2026-04-15T08:18:05Z
+cd hedgehog-1.7
+cabal --config-file=ghc-bench-cabal-config --store-dir=store user-config init
+cabal --config-file=ghc-bench-cabal-config --store-dir=store configure --with-compiler=ghc-9.12.4 --jobs=20 --enable-tests --enable-benchmarks --index-state=2026-04-15T08:18:05Z
+cabal --config-file=ghc-bench-cabal-config --store-dir=store build --only-dependencies --only-download
+
+# MEASURE hedgehog-1.7-dependencies
+cabal --config-file=ghc-bench-cabal-config --store-dir=store build --only-dependencies
+
+# MEASURE hedgehog-1.7-build
+cabal --config-file=ghc-bench-cabal-config --store-dir=store build
+

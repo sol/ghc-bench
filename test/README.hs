@@ -108,7 +108,7 @@ resultTable results = unlines $ map joinColumns table
 
 formatLabel :: Label -> Text
 formatLabel = \ case
-  "ghc-9.12.4" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
+  "ghc-9.12.4-build" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
   "hedgehog-1.7-dependencies" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
   "hedgehog-1.7-build" -> "[hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs)"
   Label label -> label

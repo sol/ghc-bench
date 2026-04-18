@@ -24,15 +24,12 @@ import Data.ByteString.Char8 (ByteString, putStrLn)
 import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
-import Benchmark.Util (Seconds(..))
+import Benchmark.Type (Label(..), Seconds(..))
 import Command (Concurrency(..))
 import SystemInfo
 
 base :: ByteString
 base = "https://github.com/sol/ghc-bench/issues/new"
-
-newtype Label = Label Text
-  deriving newtype (Eq, Show, Ord, IsString, Semigroup, Monoid)
 
 data Result = Result {
   times :: [(Label, Seconds)]

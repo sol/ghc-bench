@@ -4,7 +4,7 @@ _No response_
 
 ### Build times (seconds)
 
-ghc-9.12.4:528 hedgehog-1.7-dependencies:28 hedgehog-1.7-build:13
+ghc-9.12.4-build:528 hedgehog-1.7-dependencies:28 hedgehog-1.7-build:13
 
 ### Used number of threads
 

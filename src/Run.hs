@@ -1,21 +1,20 @@
-module Run (main) where
+module Run (main, run) where
 
 import Imports
 
+import Data.List qualified as List
 import Data.Text.IO (putStrLn)
-
 import System.Directory (createDirectoryIfMissing)
 import System.Exit (die)
 
-import Command (nproc)
+import Command (Concurrency, nproc)
 import Command qualified
-
 import SystemInfo qualified
-
 import Blob (Blob(..))
-
 import Result (Result(..), Label(..), Seconds)
 import Result qualified
+import Benchmark.Type (Benchmark, withLabel)
+import Benchmark.Type qualified as Benchmark
 import Benchmark.BuildGhc (Tarball(..))
 import Benchmark.BuildGhc qualified as BuildGhc
 import Benchmark.BuildCabalPackage qualified as BuildCabalPackage
@@ -42,38 +41,61 @@ sourceTarball = Tarball {
 cabalPackage :: FilePath
 cabalPackage = "hedgehog-1.7"
 
+parseOptions :: [FilePath] -> (Bool, [FilePath])
+parseOptions = first (not . null) . List.partition (== "--dry-run")
+
 main :: [String] -> IO ()
-main args = do
+main (parseOptions -> (dryRun, args)) = do
   Command.requireAll
-  Command.require "cabal"
   stage0 <- Command.resolve ghc
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- nproc
-  times <- map (first fromString) <$> do
+  times <- run (withTempDirectory baseDir "build") dryRun args stage0 concurrency
+  unless (null times) do
+    putStrLn "\ntimes:"
+    for_ times \ (Label name, time) -> do
+      putStrLn $ "  " <> name <> ": " <> (Result.formatTime time)
 
-    let
-      benchmarkBuildGhc :: IO (String, Seconds)
-      benchmarkBuildGhc = (,) ghc <$> do
-        withTempDirectory baseDir "build" $ BuildGhc.run sourceTarball stage0 concurrency
+    putStrLn ""
+    Result.submit Result {..}
 
-      benchmarkBuildCabalPackage :: IO [(String, Seconds)]
-      benchmarkBuildCabalPackage = map (first prependPackageName) <$> do
-        withTempDirectory baseDir "build" $ BuildCabalPackage.run cabalPackage ghc concurrency
-        where
-          prependPackageName :: String -> String
-          prependPackageName label = mconcat [cabalPackage, "-", label]
+type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
-    case args of
-      [] -> (:) <$> benchmarkBuildGhc <*> benchmarkBuildCabalPackage
-      ["ghc"] -> return <$> benchmarkBuildGhc
-      ["cabal"] -> benchmarkBuildCabalPackage
-      ["info"] -> return [("info", 0)]
-      _ -> die "usage: ghc-bench [info]"
+run :: WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
+run withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
+  [] -> runAll
+  [name] | Just action <- lookup name subcommands -> action
+  _ -> die usage
+  where
+    requireDependencies :: IO ()
+    requireDependencies = for_ dependencies Command.require
 
-  putStrLn "\ntimes:"
-  for_ times \ (Label name, time) -> do
-    putStrLn $ "  " <> name <> ": " <> (Result.formatTime time)
+    dependencies :: [FilePath]
+    dependencies = List.nub $ concatMap (Benchmark.dependencies . snd) benchmarkActions
 
-  putStrLn ""
-  Result.submit Result {..}
+    benchmarkActions :: [(String, Benchmark ())]
+    benchmarkActions = [
+        ("ghc", withLabel ghc $ BuildGhc.run sourceTarball stage0 concurrency)
+      , ("cabal", withLabel cabalPackage $ BuildCabalPackage.run cabalPackage ghc concurrency)
+      ]
+
+    runAll :: IO [(Label, Seconds)]
+    runAll = concat <$> sequence (map snd actions)
+
+    actions :: [(String, IO [(Label, Seconds)])]
+    actions = map (fmap $ withTemp . runBenchmark dryRun) benchmarkActions
+
+    subcommands :: [(FilePath, IO [(Label, Seconds)])]
+    subcommands = actions ++ [
+        ("all", runAll)
+      , ("info", return [("info", 0)])
+      ]
+
+    usage :: FilePath
+    usage = "usage: ghc-bench [ " <> List.intercalate " | " (map fst subcommands) <> " ] [ --dry-run ]"
+
+runBenchmark :: Bool -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
+runBenchmark dryRun action dir
+  | dryRun = Benchmark.dryRun $ Benchmark.cd dir action
+  | otherwise = Benchmark.run $ Benchmark.cd dir action
