@@ -13,7 +13,6 @@ module Command (
 , nproc
 
 , curl
-, tar
 
 , Concurrency(..)
 
@@ -58,9 +57,6 @@ nproc = read <$> readProcess "nproc" [] ""
 curl :: [String] -> IO ()
 curl = call "curl"
 
-tar :: [String] -> IO ()
-tar = call "tar"
-
 requireAll :: IO ()
 requireAll = do
   require "bash"
@@ -71,7 +67,6 @@ requireAll = do
   require "sha256sum"
   require "nproc"
   require "curl"
-  require "tar"
 
 require :: FilePath -> IO ()
 require = void . resolve
@@ -111,7 +106,7 @@ callWith Env{..} command args = do
 data Env = Env {
   dir :: FilePath
 , extend :: [(FilePath, FilePath)]
-}
+} deriving (Eq, Show)
 
 instance Semigroup Env where
   Env _ envl <> Env dir envr = Env dir (envl ++ envr)

@@ -26,6 +26,7 @@ executable ghc-bench
   other-modules:
       Benchmark.BuildCabalPackage
       Benchmark.BuildGhc
+      Benchmark.Type
       Benchmark.Util
       Blob
       Command
@@ -57,6 +58,7 @@ executable ghc-bench
     , process
     , temporary
     , text
+    , transformers
   default-language: GHC2024
 
 test-suite spec
@@ -65,6 +67,7 @@ test-suite spec
   other-modules:
       Benchmark.BuildCabalPackage
       Benchmark.BuildGhc
+      Benchmark.Type
       Benchmark.Util
       Blob
       Command
@@ -77,6 +80,7 @@ test-suite spec
       Helper
       README
       ResultSpec
+      RunSpec
       SystemInfoSpec
   hs-source-dirs:
       src
@@ -109,5 +113,6 @@ test-suite spec
     , silently
     , temporary
     , text
+    , transformers
     , yaml
   default-language: GHC2024

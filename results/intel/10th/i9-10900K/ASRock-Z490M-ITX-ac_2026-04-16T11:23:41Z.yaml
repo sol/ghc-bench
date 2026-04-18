@@ -1,5 +1,5 @@
 times:
-  ghc-9.12.4: 528
+  ghc-9.12.4-build: 528
   hedgehog-1.7-build: 13
   hedgehog-1.7-dependencies: 28
 concurrency: 20

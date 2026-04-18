@@ -1,32 +1,23 @@
 {-# LANGUAGE NoFieldSelectors #-}
 module Benchmark.Util (
-
   module Imports
-
+, Benchmark
 , Concurrency
 
-, Seconds(..)
+, withLabel
+, setEnv
+, cd
+, download
+, call
 , measure
 
-, callWith
-, Env(..)
-, chdir
+, tar
 ) where
 
 import Prelude as Imports
-import System.FilePath as Imports ((</>))
 
-import GHC.Clock (getMonotonicTimeNSec)
+import Benchmark.Type
+import Command (Concurrency)
 
-import Command
-
-newtype Seconds = Seconds Int
-  deriving newtype (Eq, Show, Num, Ord, Bounded)
-
-measure :: IO () -> IO Seconds
-measure action = do
-  start <- getMonotonicTimeNSec
-  action
-  end <- getMonotonicTimeNSec
-  let dtSeconds = fromIntegral (end - start) / 1e9 :: Double
-  pure . Seconds $ round dtSeconds
+tar :: [String] -> Benchmark ()
+tar = call "tar"
