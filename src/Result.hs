@@ -31,7 +31,7 @@ import SystemInfo
 base :: ByteString
 base = "https://github.com/sol/ghc-bench/issues/new"
 
-newtype Label = Label { toText :: Text }
+newtype Label = Label Text
   deriving newtype (Eq, Show, Ord, IsString, Semigroup, Monoid)
 
 data Result = Result {
@@ -204,7 +204,7 @@ resultPath :: Timestamp -> SystemInfo -> FilePath
 resultPath (Timestamp timestamp) system = joinPathComponents path
   where
     path :: [Text]
-    path = resultPath_ system.cpu ++  [file]
+    path = basePathComponents system.cpu ++  [file]
 
     file :: Text
     file = model <> "_" <> pack timestamp <> ".yaml"
@@ -216,10 +216,10 @@ resultPath (Timestamp timestamp) system = joinPathComponents path
       (_, name) -> [name]
 
 basePath :: Cpu -> String
-basePath = joinPathComponents . resultPath_
+basePath = joinPathComponents . basePathComponents
 
-resultPath_ :: Cpu -> [Text]
-resultPath_ cpu = "results" : vendor : cpuToPathComponents cpu
+basePathComponents :: Cpu -> [Text]
+basePathComponents cpu = "results" : vendor : cpuToPathComponents cpu
   where
     vendor :: Text
     vendor = case cpu.vendor of

@@ -6,6 +6,7 @@ module README (
 import Helper
 
 import Data.List qualified as List
+import Data.Tuple (swap)
 import Control.Exception
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
@@ -34,7 +35,7 @@ updateResults (resultTable -> results) = splitOutResultTable >>> \ case
 type Configuration = (Cpu, Concurrency)
 
 aggregateResults :: [Result] -> Map Configuration (Map Label [Seconds])
-aggregateResults = Map.fromListWith (Map.unionWith mappend) . map resultTimes
+aggregateResults = map resultTimes >>> Map.fromListWith (Map.unionWith (++))
   where
     resultTimes :: Result -> (Configuration, Map Label [Seconds])
     resultTimes result = (configuration, return <$> Map.fromList result.times)
@@ -55,15 +56,22 @@ resultTable results = unlines $ map joinColumns table
     header = "CPU" : map formatLabel labels
 
     rows :: [(Configuration, [Maybe Seconds])]
-    rows = List.sortOn bar . map xxx $ Map.toList aggregated
+    rows = sortByTimes . map toRow $ Map.toList aggregated
       where
-        bar :: (Configuration, [Maybe Seconds]) -> [Seconds]
-        bar = map (fromMaybe maxBound) . snd
-
-        xxx :: (Configuration, Map Label [Seconds]) -> (Configuration, [Maybe Seconds])
-        xxx (c, Map.mapMaybe median -> times) = (c, foo)
+        sortByTimes :: [(c, [Maybe Seconds])] -> [(c, [Maybe Seconds])]
+        sortByTimes = List.sortOn sortKey
           where
-            foo = map (`Map.lookup` times) labels
+            sortKey :: (c, [Maybe Seconds]) -> [Seconds]
+            sortKey = map (fromMaybe maxBound) . snd
+
+        toRow :: (Configuration, Map Label [Seconds]) -> (Configuration, [Maybe Seconds])
+        toRow (configuration, times) = (configuration, columns)
+          where
+            medians :: Map Label Seconds
+            medians = Map.mapMaybe median times
+
+            columns :: [Maybe Seconds]
+            columns = map (`Map.lookup` medians) labels
 
     formatRow :: (Configuration, [Maybe Seconds]) -> [Text]
     formatRow ((cpu, _), times) = formatCpu cpu : map formatColumn times
@@ -78,15 +86,18 @@ resultTable results = unlines $ map joinColumns table
 
     labels :: [Label]
     labels = sortLabels . Set.toList . mconcat . map Map.keysSet $ Map.elems aggregated
-
-    sortLabels :: [Label] -> [Label]
-    sortLabels = List.sortOn p
       where
-        p :: Label -> Maybe (Int, Label)
-        p label = ($> label) <$> List.find pp labelOrder
+        sortLabels :: [Label] -> [Label]
+        sortLabels = List.sortOn sortKey
+
+        sortKey :: Label -> (Text, Int)
+        sortKey (Label label) = fromMaybe (label, maxBound) key
           where
-            pp :: (Int, Text) -> Bool
-            pp (_, ppp) = T.isSuffixOf ppp (label.toText)
+            key :: Maybe (Text, Int)
+            key = swap <$> (listToMaybe (mapMaybe toKey labelOrder))
+
+            toKey :: (Int, Text) -> Maybe (Int, Text)
+            toKey = traverse (`T.stripSuffix` label)
 
         labelOrder :: [(Int, Text)]
         labelOrder = zip [0..] [
@@ -95,20 +106,12 @@ resultTable results = unlines $ map joinColumns table
           , "-build"
           ]
 
-ensureFile :: FilePath -> ByteString -> IO ()
-ensureFile file new = do
-  old <- try @IOException $ B.readFile file
-  unless (old == Right new) do
-    createDirectoryIfMissing True (takeDirectory file)
-    B.writeFile file new
-
 formatLabel :: Label -> Text
 formatLabel = \ case
   "ghc-9.12.4" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
   "hedgehog-1.7-dependencies" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
   "hedgehog-1.7-build" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
   Label label -> label
-
 
 formatCpu :: Cpu -> Text
 formatCpu cpu = mconcat ["[", cpuName cpu, "](", pack $ basePath cpu,  ")"]
@@ -117,3 +120,10 @@ median :: [Seconds] -> Maybe Seconds
 median = List.sort >>> \ case
   [] -> Nothing
   values -> Just $ values !! (length values `div` 2)
+
+ensureFile :: FilePath -> ByteString -> IO ()
+ensureFile file new = do
+  old <- try @IOException $ B.readFile file
+  unless (old == Right new) do
+    createDirectoryIfMissing True (takeDirectory file)
+    B.writeFile file new
