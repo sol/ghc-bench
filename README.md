@@ -2,7 +2,7 @@
 
 ## Benchmark results
 
-| CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) |
+| CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs) |
 | --- | --- | --- | --- |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - |
