@@ -2,6 +2,8 @@
 module Result (
   submit
 , Result(..)
+, Label(..)
+, Seconds(..)
 , Concurrency(..)
 , parseFromIssueBody
 , resultPath
@@ -22,14 +24,18 @@ import Data.ByteString.Char8 (ByteString, putStrLn)
 import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
+import Benchmark.Util (Seconds(..))
 import Command (Concurrency(..))
 import SystemInfo
 
 base :: ByteString
 base = "https://github.com/sol/ghc-bench/issues/new"
 
+newtype Label = Label { toText :: Text }
+  deriving newtype (Eq, Show, Ord, IsString, Semigroup, Monoid)
+
 data Result = Result {
-  times :: [(Text, Int)]
+  times :: [(Label, Seconds)]
 , concurrency :: Concurrency
 , system :: SystemInfo
 } deriving (Eq, Show, Generic)
@@ -80,7 +86,7 @@ issueUrl result = base <> renderQuery [
       , fromMaybe "unknown" system.cpu.stepping
       ]
 
-issueTitle :: Int -> SystemInfo -> Text
+issueTitle :: Seconds -> SystemInfo -> Text
 issueTitle seconds system = unwords ["[result]", formatTime seconds, "-", description, "-", cpuName system.cpu]
   where
     description :: Text
@@ -103,8 +109,8 @@ cpuName cpu = case cpu.vendor of
       $ name
   _ -> cpu.name
 
-formatTime :: Int -> Text
-formatTime seconds = case seconds `divMod` 60 of
+formatTime :: Seconds -> Text
+formatTime (Seconds seconds) = case seconds `divMod` 60 of
   (0, s) -> show s <> "s"
   (m, s) -> mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
 
@@ -181,15 +187,15 @@ parseFromIssueBody markdown = Result {
           (key, "_No response_") -> (key, "")
           (key, value) -> (key, value)
 
-formatTimes :: [(Text, Int)] -> Text
+formatTimes :: [(Label, Seconds)] -> Text
 formatTimes = unwords . map \ case
-  (name, time) -> mconcat [name, ":", show time]
+  (Label name, time) -> mconcat [name, ":", show time]
 
-parseTimes :: Text -> [(Text, Int)]
+parseTimes :: Text -> [(Label, Seconds)]
 parseTimes = words >>> map parseTime
   where
-    parseTime :: Text -> (Text, Int)
-    parseTime = T.breakOn ":" >>> fmap (read . T.drop 1)
+    parseTime :: Text -> (Label, Seconds)
+    parseTime = T.breakOn ":" >>> bimap Label (Seconds . read . T.drop 1)
 
 newtype Timestamp = Timestamp String
   deriving newtype (Eq, Show, Read, IsString)

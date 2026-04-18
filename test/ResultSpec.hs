@@ -1,22 +1,22 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module ResultSpec (spec) where
 
-import README (ensureFile)
 import Helper
 
 import Data.Ord (comparing)
+import Data.Aeson (ToJSONKey)
 import Data.Yaml (ToJSON(..), object, (.=))
 import Data.Yaml.Pretty qualified as Yaml
 import System.Directory (listDirectory)
 import Data.Text.IO.Utf8 qualified as Utf8
+import Data.Map.Strict qualified as Map
 
 import Fixtures.System qualified as System
+import README (ensureFile)
+import README qualified (update)
 
 import SystemInfo
 import Result
-
-import Data.Map.Strict qualified as Map
-import README qualified (update)
 
 spec :: Spec
 spec = do
@@ -139,6 +139,8 @@ instance ToJSON Result where
     , "system" .= system
     ]
 
+deriving newtype instance ToJSONKey Label
+deriving newtype instance ToJSON Seconds
 deriving newtype instance ToJSON Concurrency
 instance ToJSON SystemInfo
 instance ToJSON Product

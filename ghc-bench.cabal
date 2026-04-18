@@ -97,7 +97,8 @@ test-suite spec
   build-tool-depends:
       hspec-discover:hspec-discover
   build-depends:
-      base ==4.*
+      aeson
+    , base ==4.*
     , bytestring
     , containers
     , directory

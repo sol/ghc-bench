@@ -11,13 +11,13 @@ data Tarball = Tarball {
 , root :: FilePath
 } deriving (Eq, Show)
 
-run :: Tarball -> FilePath -> Concurrency -> FilePath -> IO Int
+run :: Tarball -> FilePath -> Concurrency -> FilePath -> IO Seconds
 run tarball stage0 concurrency sandbox = do
   Blob.download tarball.blob
   tar ["-xf", tarball.blob.path, "-C", sandbox]
   build stage0 concurrency (sandbox </> tarball.root)
 
-build :: FilePath -> Concurrency -> FilePath -> IO Int
+build :: FilePath -> Concurrency -> FilePath -> IO Seconds
 build stage0 concurrency dir = do
   call "./configure" []
   hadrian ["--help"] -- this makes sure that building hadrian dependencies is not measured

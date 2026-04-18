@@ -1,95 +1,75 @@
-module README where
+module README (
+  update
+, ensureFile
+) where
 
-import Data.Functor
-import Data.Text qualified as T
-import Data.Set qualified as Set
-import Data.List qualified as List
 import Helper
 
+import Data.List qualified as List
 import Control.Exception
-import Data.ByteString (ByteString)
-import Data.ByteString qualified as B
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
+import Data.ByteString (ByteString)
+import Data.ByteString qualified as B
+import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
-
-
-import SystemInfo
-import Result
-
+import Data.Set qualified as Set
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 
+import Result
+import SystemInfo
+
 update :: [Result] -> IO ()
 update results = do
-  t <- Utf8.readFile "README.md"
+      Utf8.readFile "README.md"
+  >>= (updateResults results >>> encodeUtf8 >>> ensureFile "README.md")
 
-  let
-    (pre, xx) = T.breakOnEnd "## Benchmark results\n" t
-    (_, post) = T.breakOn "## " xx
+updateResults :: [Result] -> Text -> Text
+updateResults (resultTable -> results) = splitOutResultTable >>> \ case
+  (prefix, (_results, suffix)) -> mconcat [prefix, "\n", results, "\n", suffix]
+  where
+    splitOutResultTable = T.breakOnEnd "## Benchmark results\n" >>> (<&> T.breakOn "## ")
 
-  ensureFile "README.md" . encodeUtf8 $ mconcat [
-      pre
-    , "\n"
-    , mdTable results
-    , "\n"
-    , post
-    ]
-
-type Label = Text
-type Seconds = Int
 type Configuration = (Cpu, Concurrency)
 
-type ResultMap = Map Label (Map Configuration [Seconds])
-
-type Aggregation = Map Configuration (Map Label [Seconds])
-type FinalAggregation = Map Configuration (Map Label Seconds)
-
-median :: [Seconds] -> Maybe Seconds
-median = List.sort >>> \ case
-  [] -> Nothing
-  xs -> Just $ xs !! (length xs `div` 2)
-
 aggregateResults :: [Result] -> Map Configuration (Map Label [Seconds])
-aggregateResults = Map.fromListWith bar . map foo
+aggregateResults = Map.fromListWith (Map.unionWith mappend) . map resultTimes
   where
-    bar ::
-      Map Label [Seconds]
-      -> Map Label [Seconds]
-      -> Map Label [Seconds]
-    bar = Map.unionWith (++)
-
-    foo :: Result -> (Configuration, Map Label [Seconds])
-    foo result = (configuration, return <$> Map.fromList result.times)
+    resultTimes :: Result -> (Configuration, Map Label [Seconds])
+    resultTimes result = (configuration, return <$> Map.fromList result.times)
       where
         configuration :: Configuration
         configuration = (result.system.cpu, result.concurrency)
 
-mdTable :: [Result] -> Text
-mdTable results = unlines $ map joinColumns xxx
+resultTable :: [Result] -> Text
+resultTable results = unlines $ map joinColumns table
   where
+    table :: [[Text]]
+    table = header : replicate (length header) "---" : map formatRow rows
+
     joinColumns :: [Text] -> Text
     joinColumns columns = mconcat ["| ", T.intercalate " | " columns, " |"]
 
-    xxx :: [[Text]]
-    xxx = header : (replicate (length header) "---" ) : map formatRow rows
-
+    header :: [Text]
     header = "CPU" : map formatLabel labels
 
-    rows :: [(Cpu, Map Text Int)]
-    rows = List.sortOn f $ map (fmap $ Map.mapMaybe median) $ map (first fst) $ Map.toList aggregated
+    rows :: [(Configuration, [Maybe Seconds])]
+    rows = List.sortOn bar . map xxx $ Map.toList aggregated
       where
-        f :: (Cpu, Map Text Int) -> [Int]
-        f (_, xs) = map g labels
-          where
-            g :: Text -> Int
-            g l = Map.findWithDefault maxBound l xs
+        bar :: (Configuration, [Maybe Seconds]) -> [Seconds]
+        bar = map (fromMaybe maxBound) . snd
 
-    formatRow :: (Cpu, Map Text Int) -> [Text]
-    formatRow (cpu, times) = formatCpu cpu : map formatColumn labels
+        xxx :: (Configuration, Map Label [Seconds]) -> (Configuration, [Maybe Seconds])
+        xxx (c, Map.mapMaybe median -> times) = (c, foo)
+          where
+            foo = map (`Map.lookup` times) labels
+
+    formatRow :: (Configuration, [Maybe Seconds]) -> [Text]
+    formatRow ((cpu, _), times) = formatCpu cpu : map formatColumn times
       where
-        formatColumn :: Label -> Text
-        formatColumn label = case Map.lookup label times of
+        formatColumn :: Maybe Seconds -> Text
+        formatColumn = \ case
           Nothing -> "-"
           Just t -> formatTime t
 
@@ -102,11 +82,11 @@ mdTable results = unlines $ map joinColumns xxx
     sortLabels :: [Label] -> [Label]
     sortLabels = List.sortOn p
       where
-        p :: Label -> Maybe (Int, Text)
+        p :: Label -> Maybe (Int, Label)
         p label = ($> label) <$> List.find pp labelOrder
           where
             pp :: (Int, Text) -> Bool
-            pp (_, ppp) = T.isSuffixOf ppp label
+            pp (_, ppp) = T.isSuffixOf ppp (label.toText)
 
         labelOrder :: [(Int, Text)]
         labelOrder = zip [0..] [
@@ -122,13 +102,18 @@ ensureFile file new = do
     createDirectoryIfMissing True (takeDirectory file)
     B.writeFile file new
 
-formatLabel :: Text -> Text
+formatLabel :: Label -> Text
 formatLabel = \ case
   "ghc-9.12.4" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
   "hedgehog-1.7-dependencies" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
   "hedgehog-1.7-build" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
-  label -> label
+  Label label -> label
 
 
 formatCpu :: Cpu -> Text
 formatCpu cpu = mconcat ["[", cpuName cpu, "](", pack $ basePath cpu,  ")"]
+
+median :: [Seconds] -> Maybe Seconds
+median = List.sort >>> \ case
+  [] -> Nothing
+  values -> Just $ values !! (length values `div` 2)

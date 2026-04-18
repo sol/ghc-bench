@@ -2,12 +2,12 @@ module Benchmark.BuildCabalPackage (run) where
 
 import Benchmark.Util
 
-run :: String -> FilePath -> Concurrency -> FilePath -> IO [(String, Int)]
+run :: String -> FilePath -> Concurrency -> FilePath -> IO [(String, Seconds)]
 run package ghc concurrency sandbox = do
   callWith (chdir sandbox) "cabal" ["unpack", package, indexState]
   build ghc concurrency (sandbox </> package)
 
-build :: FilePath -> Concurrency -> FilePath -> IO [(String, Int)]
+build :: FilePath -> Concurrency -> FilePath -> IO [(String, Seconds)]
 build ghc concurrency dir = do
   cabal "user-config" ["init"]
   downloadDependencies

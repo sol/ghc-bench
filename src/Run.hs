@@ -14,7 +14,7 @@ import SystemInfo qualified
 
 import Blob (Blob(..))
 
-import Result (Result(..))
+import Result (Result(..), Label(..), Seconds)
 import Result qualified
 import Benchmark.BuildGhc (Tarball(..))
 import Benchmark.BuildGhc qualified as BuildGhc
@@ -50,14 +50,14 @@ main args = do
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- nproc
-  times <- map (first pack) <$> do
+  times <- map (first fromString) <$> do
 
     let
-      benchmarkBuildGhc :: IO (String, Int)
+      benchmarkBuildGhc :: IO (String, Seconds)
       benchmarkBuildGhc = (,) ghc <$> do
         withTempDirectory baseDir "build" $ BuildGhc.run sourceTarball stage0 concurrency
 
-      benchmarkBuildCabalPackage :: IO [(String, Int)]
+      benchmarkBuildCabalPackage :: IO [(String, Seconds)]
       benchmarkBuildCabalPackage = map (first prependPackageName) <$> do
         withTempDirectory baseDir "build" $ BuildCabalPackage.run cabalPackage ghc concurrency
         where
@@ -72,8 +72,8 @@ main args = do
       _ -> die "usage: ghc-bench [info]"
 
   putStrLn "\ntimes:"
-  for_ times \ (name, time) -> do
-    putStrLn $ "  " <> name <> ": " <> (show time)
+  for_ times \ (Label name, time) -> do
+    putStrLn $ "  " <> name <> ": " <> (Result.formatTime time)
 
   putStrLn ""
   Result.submit Result {..}
