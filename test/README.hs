@@ -6,7 +6,6 @@ module README (
 import Helper
 
 import Data.List qualified as List
-import Data.Tuple (swap)
 import Control.Exception
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
@@ -90,28 +89,27 @@ resultTable results = unlines $ map joinColumns table
         sortLabels :: [Label] -> [Label]
         sortLabels = List.sortOn sortKey
 
-        sortKey :: Label -> (Text, Int)
-        sortKey (Label label) = fromMaybe (label, maxBound) key
-          where
-            key :: Maybe (Text, Int)
-            key = swap <$> (listToMaybe (mapMaybe toKey labelOrder))
+        sortKey :: Label -> Int
+        sortKey (Label label) = fromMaybe maxBound $ lookup label labelOrder
 
-            toKey :: (Int, Text) -> Maybe (Int, Text)
-            toKey = traverse (`T.stripSuffix` label)
-
-        labelOrder :: [(Int, Text)]
-        labelOrder = zip [0..] [
-            "ghc"
-          , "-dependencies"
-          , "-build"
-          ]
+        labelOrder :: [(Text, Int)]
+        labelOrder = zip [
+            "ghc-9.12.4-build"
+          , "hedgehog-1.7-dependencies"
+          , "hedgehog-1.7-build"
+          , "containers-0.8-ghci"
+          ] [0..]
 
 formatLabel :: Label -> Text
-formatLabel = \ case
-  "ghc-9.12.4-build" -> "[GHC 9.12.4 build](src/Benchmark/BuildGhc.hs)"
-  "hedgehog-1.7-dependencies" -> "[hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs)"
-  "hedgehog-1.7-build" -> "[hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs)"
-  Label label -> label
+formatLabel (Label label) = case label of
+  "ghc-9.12.4-build" -> markdownLink "GHC 9.12.4 build" "src/Benchmark/BuildGhc.hs"
+  "hedgehog-1.7-dependencies" -> markdownLink label "src/Benchmark/BuildCabalPackage.hs"
+  "hedgehog-1.7-build" -> markdownLink label "src/Benchmark/BuildCabalPackage.hs"
+  "containers-0.8-ghci" -> markdownLink label "src/Benchmark/Ghci.hs"
+  _ -> label
+
+markdownLink :: Text -> Text -> Text
+markdownLink name url = "[" <> name <> "](" <> url <> ")"
 
 formatCpu :: Cpu -> Text
 formatCpu cpu = mconcat ["[", cpuName cpu, "](", pack $ basePath cpu,  ")"]
