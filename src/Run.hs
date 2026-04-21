@@ -18,6 +18,7 @@ import Benchmark.Type qualified as Benchmark
 import Benchmark.BuildGhc (Tarball(..))
 import Benchmark.BuildGhc qualified as BuildGhc
 import Benchmark.BuildCabalPackage qualified as BuildCabalPackage
+import Benchmark.Ghci qualified as Ghci
 
 version :: FilePath
 version = "9.12.4"
@@ -40,6 +41,9 @@ sourceTarball = Tarball {
 
 cabalPackage :: FilePath
 cabalPackage = "hedgehog-1.7"
+
+ghciPackage :: FilePath
+ghciPackage = "containers-0.8"
 
 parseOptions :: [FilePath] -> (Bool, [FilePath])
 parseOptions = first (not . null) . List.partition (== "--dry-run")
@@ -78,6 +82,7 @@ run withTemp dryRun args stage0 concurrency = requireDependencies >> case args o
     benchmarkActions = [
         ("ghc", withLabel ghc $ BuildGhc.run sourceTarball stage0 concurrency)
       , ("cabal", withLabel cabalPackage $ BuildCabalPackage.run cabalPackage ghc concurrency)
+      , ("ghci", withLabel ghciPackage $ Ghci.run ghciPackage ghc concurrency)
       ]
 
     runAll :: IO [(Label, Seconds)]

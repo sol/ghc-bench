@@ -17,6 +17,7 @@ module Benchmark.Type (
 import Imports
 
 import GHC.Clock (getMonotonicTimeNSec)
+import Data.Char (isSpace)
 import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
 import System.FilePath (splitPath)
@@ -135,7 +136,7 @@ dryRunForest = fmap unlines . runWriter . \ commands -> do
         return []
 
       Call command args -> do
-        writeLine . unwords $ map pack (command : args)
+        writeLine $ showCommand command args
         return []
 
       Measure (Label label) commands -> do
@@ -143,6 +144,14 @@ dryRunForest = fmap unlines . runWriter . \ commands -> do
         writeLine $ "# MEASURE " <> label
         times <- go commands
         return $ (Label label, 0) : times
+
+showCommand :: String -> [String] -> Text
+showCommand command = unwords . map showArg . (:) command
+
+showArg :: String -> Text
+showArg arg
+  | any isSpace arg = show arg
+  | otherwise = pack arg
 
 execForest :: [Command] -> IO [(Label, Seconds)]
 execForest = go mempty

@@ -1,7 +1,7 @@
 spec-version: 0.36.0
 
 name: ghc-bench
-version: 0.2.0
+version: 0.3.0
 synopsis: Benchmark a Haskell development system
 description: See the README at <https://github.com/sol/ghc-bench#readme>
 author: Simon Hengel <sol@typeful.net>
