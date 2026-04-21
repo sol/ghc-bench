@@ -36,3 +36,15 @@ cabal --config-file=ghc-bench-cabal-config --store-dir=store build --only-depend
 # MEASURE hedgehog-1.7-build
 cabal --config-file=ghc-bench-cabal-config --store-dir=store build
 
+
+############################################
+# With a fresh temporary working directory #
+############################################
+
+cd <sandbox>
+cabal unpack containers-0.8 --index-state=2026-04-15T08:18:05Z
+cd containers-0.8
+
+# MEASURE containers-0.8-ghci
+bash -c "echo | ghc-9.12.4 --interactive -ignore-dot-ghci -isrc `find src -name '*.hs'` -Iinclude -XHaskell2010"
+
