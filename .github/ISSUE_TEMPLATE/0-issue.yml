@@ -1,0 +1,8 @@
+name: Issue
+description: Report an issue
+
+body:
+  - type: textarea
+    attributes:
+      label: Add a description (optional)
+      placeholder: Type your description here…
