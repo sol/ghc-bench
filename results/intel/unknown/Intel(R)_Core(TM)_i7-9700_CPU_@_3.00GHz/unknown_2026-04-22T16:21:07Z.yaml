@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 7
+  ghc-9.12.4-build: 924
+  hedgehog-1.7-build: 23
+  hedgehog-1.7-dependencies: 49
+concurrency: 8
+system:
+  os: Ubuntu
+  arch: x86_64
+  vendor: unknown
+  product:
+    category: unknown
+    chassis_type: unknown
+    name: unknown
+    family: unknown
+    version: unknown
+  board:
+    name: unknown
+    vendor: unknown
+  cpu:
+    name: Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz
+    cores: 8
+    threads: 8
+    vendor: GenuineIntel
+    family: '6'
+    model: '158'
+    stepping: '13'
+  ram: 8
