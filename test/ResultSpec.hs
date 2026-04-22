@@ -42,19 +42,19 @@ spec = do
   describe "parseFromIssueBody" do
     let
       fixtures = [
-          ("raw/2026-04-12T16:01:13Z", Result {
+          ("raw/2026-04-12_16-01-13", Result {
               times = [("ghc-9.12.4-build", 526)]
             , concurrency = 20
             , system = System.i10900K_desktop
             }
           )
-        , ("raw/2026-04-12T13:37:10Z", Result {
+        , ("raw/2026-04-12_13-37-10", Result {
               times = [("ghc-9.12.4-build", 715)]
             , concurrency = 8
             , system = System.dell_xps
             }
           )
-        , ("raw/2026-04-12T17:38:23Z", Result {
+        , ("raw/2026-04-12_17-38-23", Result {
               times = [("ghc-9.12.4-build", 3013)]
             , concurrency = 2
             , system = System.x200

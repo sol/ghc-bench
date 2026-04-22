@@ -19,10 +19,10 @@ jobs:
       - run: cabal update
       - run: cabal build all --dry-run -v0
 
-      - run: echo "version=`ghc --numeric-version`" >> $GITHUB_OUTPUT
+      - run: echo "version=$(ghc --numeric-version)" >> "$GITHUB_OUTPUT"
         id: ghc
 
-      - run: echo "store-dir=`cabal -v0 path --store-dir`" >> $GITHUB_OUTPUT
+      - run: echo "store-dir=$(cabal -v0 path --store-dir)" >> "$GITHUB_OUTPUT"
         id: cabal-path
 
       - uses: actions/cache/restore@v5
@@ -34,14 +34,23 @@ jobs:
           key: ${{ env.key }}-${{ hashFiles('dist-newstyle/cache/plan.json') }}
           restore-keys: ${{ env.key }}-
 
-      - run: echo '${{ github.event.issue.body }}' > 'raw/${{ github.event.issue.created_at }}'
+      - name: Write result to file
+        run: |
+          NAME="${CREATED_AT//:/-}"
+          NAME="${NAME/T/_}"
+          NAME="${NAME/Z/}"
+          printf "%s" "$RAW_RESULT" > "raw/$NAME"
+        env:
+          RAW_RESULT: ${{ github.event.issue.body }}
+          CREATED_AT: ${{ github.event.issue.created_at }}
+
       - run: cabal test
 
       - name: Create branch
         run: |
           BRANCH='auto/process-result-${{ github.event.issue.number }}'
           git checkout -b "$BRANCH"
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       - name: Commit changes
         run: |
