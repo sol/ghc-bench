@@ -30,7 +30,7 @@ I'm interested in the following workloads:
 - Building a Cabal project
 - Loading a project into `ghci`
 
-## Running `ghc-bench`
+## Running `ghc-bench` (Linux only)
 
 Requirements:
 
@@ -65,12 +65,12 @@ $ ghc-bench
 Install `cabal` and `ghc-bench`:
 ```console
 $ stack --resolver=nightly-2026-04-11 install cabal-install
-$ cabal update && stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH cabal install ghc-bench
+$ cabal update && stack --resolver=nightly-2026-04-11 exec --no-ghc-package-path -- cabal install ghc-bench
 ```
 
 Run `ghc-bench`:
 ```console
-$ stack --resolver=nightly-2026-04-11 exec -- env --unset=GHC_PACKAGE_PATH ghc-bench
+$ stack --resolver=nightly-2026-04-11 exec --no-ghc-package-path -- ghc-bench
 ```
 
 ## Submitting a benchmark result
