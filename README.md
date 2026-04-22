@@ -7,6 +7,7 @@
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s | 5s |
 | [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) | 661s (11m 1s) | 27s | 21s | 7s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
+| [Intel Core i7-9700](results/intel/unknown/Intel(R)_Core(TM)_i7-9700_CPU_@_3.00GHz) | 924s (15m 24s) | 49s | 23s | 7s |
 | [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - | - |
 
 ## About
