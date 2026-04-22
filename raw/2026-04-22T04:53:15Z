@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:523 hedgehog-1.7-dependencies:27 hedgehog-1.7-build:12 containers-0.8-ghci:5
+
+### Used number of threads
+
+20
+
+### CPU Name
+
+Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 165 / 5
+
+### Cores
+
+10
+
+### Threads
+
+20
+
+### Operating System
+
+Arch Linux
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+ASRock Z490M-ITX/ac
+
+### RAM Size (GB)
+
+32
+
+### System Vendor
+
+To Be Filled By O.E.M.
+
+### Product Category
+
+desktop
+
+### Chassis Type
+
+3
+
+### Product Family
+
+To Be Filled By O.E.M.
+
+### Product Name
+
+To Be Filled By O.E.M.
+
+### Product Version
+
+To Be Filled By O.E.M.

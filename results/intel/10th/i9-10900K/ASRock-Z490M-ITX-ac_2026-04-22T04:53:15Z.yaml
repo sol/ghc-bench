@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 5
+  ghc-9.12.4-build: 523
+  hedgehog-1.7-build: 12
+  hedgehog-1.7-dependencies: 27
+concurrency: 20
+system:
+  os: Arch Linux
+  arch: x86_64
+  vendor: To Be Filled By O.E.M.
+  product:
+    category: desktop
+    chassis_type: '3'
+    name: To Be Filled By O.E.M.
+    family: To Be Filled By O.E.M.
+    version: To Be Filled By O.E.M.
+  board:
+    name: Z490M-ITX/ac
+    vendor: ASRock
+  cpu:
+    name: Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz
+    cores: 10
+    threads: 20
+    vendor: GenuineIntel
+    family: '6'
+    model: '165'
+    stepping: '5'
+  ram: 32
