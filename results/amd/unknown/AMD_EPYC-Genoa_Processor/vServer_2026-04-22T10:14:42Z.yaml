@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 7
+  ghc-9.12.4-build: 661
+  hedgehog-1.7-build: 21
+  hedgehog-1.7-dependencies: 27
+concurrency: 12
+system:
+  os: Debian GNU/Linux
+  arch: x86_64
+  vendor: Hetzner
+  product:
+    category: unknown
+    chassis_type: '1'
+    name: vServer
+    family: Hetzner_vServer
+    version: '20171111'
+  board:
+    name: 2009)
+    vendor: KVM Standard PC (Q35 + ICH9,
+  cpu:
+    name: AMD EPYC-Genoa Processor
+    cores: 12
+    threads: 12
+    vendor: AuthenticAMD
+    family: '25'
+    model: '17'
+    stepping: '0'
+  ram: 23

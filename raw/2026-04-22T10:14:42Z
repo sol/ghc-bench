@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+Ive benchmarked the cpx52 hetzner instance Ive been using for somethings.
+
+### Build times (seconds)
+
+ghc-9.12.4-build:661 hedgehog-1.7-dependencies:27 hedgehog-1.7-build:21 containers-0.8-ghci:7
+
+### Used number of threads
+
+12
+
+### CPU Name
+
+AMD EPYC-Genoa Processor
+
+### CPUID (vendor / family / model / stepping)
+
+AuthenticAMD / 25 / 17 / 0
+
+### Cores
+
+12
+
+### Threads
+
+12
+
+### Operating System
+
+Debian GNU/Linux
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+KVM Standard PC (Q35 + ICH9, 2009)
+
+### RAM Size (GB)
+
+23
+
+### System Vendor
+
+Hetzner
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+1
+
+### Product Family
+
+Hetzner_vServer
+
+### Product Name
+
+vServer
+
+### Product Version
+
+20171111
