@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+This was via WSL2 - `ghc-bench` appears to need at least one tool (`lscpu`) that the MSYS2 project cannot provide on Windows. The machine is a Lenovo ThinkPad X1 Carbon Gen 13, with 32 GB of 8,533 MT/s RAM (not 16 GB, as stated below).
+
+### Build times (seconds)
+
+ghc-9.12.4-build:995 hedgehog-1.7-dependencies:60 hedgehog-1.7-build:18 containers-0.8-ghci:7
+
+### Used number of threads
+
+8
+
+### CPU Name
+
+Intel(R) Core(TM) Ultra 7 258V
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 189 / 1
+
+### Cores
+
+8
+
+### Threads
+
+8
+
+### Operating System
+
+Ubuntu
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+unknown unknown
+
+### RAM Size (GB)
+
+16
+
+### System Vendor
+
+unknown
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+unknown
+
+### Product Family
+
+unknown
+
+### Product Name
+
+unknown
+
+### Product Version
+
+unknown

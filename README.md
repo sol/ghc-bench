@@ -6,6 +6,7 @@
 | --- | --- | --- | --- | --- |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s | 5s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
+| [Intel Core Ultra 7 258V](results/intel/unknown/Intel(R)_Core(TM)_Ultra_7_258V) | 995s (16m 35s) | 60s (1m 0s) | 18s | 7s |
 | [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - | - |
 
 ## About
