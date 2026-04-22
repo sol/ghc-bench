@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 7
+  ghc-9.12.4-build: 730
+  hedgehog-1.7-build: 16
+  hedgehog-1.7-dependencies: 35
+concurrency: 12
+system:
+  os: FreeBSD
+  arch: amd64
+  vendor: unknown
+  product:
+    category: unknown
+    chassis_type: unknown
+    name: unknown
+    family: unknown
+    version: unknown
+  board:
+    name: ELITE
+    vendor: GIGABYTE B550M AORUS
+  cpu:
+    name: AMD Ryzen 5 5600X
+    cores: 6
+    threads: 12
+    vendor: null
+    family: null
+    model: null
+    stepping: null
+  ram: 32

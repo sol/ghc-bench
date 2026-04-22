@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:730 hedgehog-1.7-dependencies:35 hedgehog-1.7-build:16 containers-0.8-ghci:7
+
+### Used number of threads
+
+12
+
+### CPU Name
+
+AMD Ryzen 5 5600X
+
+### CPUID (vendor / family / model / stepping)
+
+unknown / unknown / unknown / unknown
+
+### Cores
+
+6
+
+### Threads
+
+12
+
+### Operating System
+
+FreeBSD
+
+### Architecture
+
+amd64
+
+### Motherboard
+
+GIGABYTE B550M AORUS ELITE
+
+### RAM Size (GB)
+
+32
+
+### System Vendor
+
+unknown
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+unknown
+
+### Product Family
+
+unknown
+
+### Product Name
+
+unknown
+
+### Product Version
+
+unknown
