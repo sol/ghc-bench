@@ -65,8 +65,7 @@ $ ghc-bench
 Install `cabal` and `ghc-bench`:
 ```console
 $ stack --resolver=nightly-2026-04-11 install cabal-install
-$ cabal update
-$ stack --snapshot=nightly-2026-04-11 install ghc-bench
+$ cabal update && stack --resolver=nightly-2026-04-11 exec --no-ghc-package-path -- cabal install ghc-bench
 ```
 
 Run `ghc-bench`:
