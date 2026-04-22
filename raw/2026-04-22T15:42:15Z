@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:754 hedgehog-1.7-dependencies:33 hedgehog-1.7-build:15 containers-0.8-ghci:5
+
+### Used number of threads
+
+6
+
+### CPU Name
+
+AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)
+
+### CPUID (vendor / family / model / stepping)
+
+AuthenticAMD / 26 / 68 / 0
+
+### Cores
+
+6
+
+### Threads
+
+6
+
+### Operating System
+
+Debian GNU/Linux
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+Oracle Corporation VirtualBox
+
+### RAM Size (GB)
+
+32
+
+### System Vendor
+
+innotek GmbH
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+1
+
+### Product Family
+
+Virtual Machine
+
+### Product Name
+
+VirtualBox
+
+### Product Version
+
+1.2

@@ -7,6 +7,7 @@
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s | 5s |
 | [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) | 661s (11m 1s) | 27s | 21s | 7s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
+| [AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) | 754s (12m 34s) | 33s | 15s | 5s |
 | [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - | - |
 
 ## About
