@@ -55,6 +55,8 @@ jobs:
       - name: Push branch
         run: |
           git push origin "$BRANCH" --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.OPEN_RESULT_PR }}
 
       - name: Create PR
         run: |
