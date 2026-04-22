@@ -29,7 +29,7 @@ data SystemInfo = SystemInfo {
 collect :: IO SystemInfo
 collect = do
   os <- eval ". /etc/os-release && echo $NAME || uname" <&> strip
-  arch <- uname ["--machine"]
+  arch <- uname ["-m"]
   vendor <- fromFile "/sys/class/dmi/id/sys_vendor"
   product <- getProductInfo
   board <- getBoardInfo
