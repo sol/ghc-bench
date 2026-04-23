@@ -39,7 +39,7 @@ jobs:
           NAME="${CREATED_AT//:/-}"
           NAME="${NAME/T/_}"
           NAME="${NAME/Z/}"
-          printf "%s" "$RAW_RESULT" > "raw/$NAME"
+          printf "%s\n" "$RAW_RESULT" > "raw/$NAME"
         env:
           RAW_RESULT: ${{ github.event.issue.body }}
           CREATED_AT: ${{ github.event.issue.created_at }}

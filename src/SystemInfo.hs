@@ -1,5 +1,6 @@
 module SystemInfo (
   collect
+, pretty
 , SystemInfo(..)
 , Product(..)
 , Board(..)
@@ -14,17 +15,8 @@ import Control.Exception
 import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
 
+import SystemInfo.Type
 import Command (eval, uname, lscpu, free, awk)
-
-data SystemInfo = SystemInfo {
-  os :: Text
-, arch :: Text
-, vendor :: Text
-, product :: Product
-, board :: Board
-, cpu :: Cpu
-, ram :: Int
-} deriving (Eq, Show, Generic)
 
 collect :: IO SystemInfo
 collect = do
@@ -41,14 +33,6 @@ collect = do
     toGb bytes = case ceiling @Double $ fromIntegral bytes / 1024 / 1024 / 1024 of
       31 -> 32 -- adjust for reserved ram that is not visible to the os
       n -> n
-
-data Product = Product {
-  category :: Text
-, chassis_type :: Text
-, family :: Text
-, name :: Text
-, version :: Text
-} deriving (Eq, Show, Generic)
 
 getProductInfo :: IO Product
 getProductInfo = do
@@ -71,26 +55,11 @@ interpretChassisType = \ case
   "14" -> "laptop"
   _ -> "unknown"
 
-data Board = Board {
-  vendor :: Text
-, name :: Text
-} deriving (Eq, Show, Generic)
-
 getBoardInfo :: IO Board
 getBoardInfo = do
   vendor <- fromFile "/sys/class/dmi/id/board_vendor"
   name <- fromFile "/sys/class/dmi/id/board_name"
   return Board {..}
-
-data Cpu = Cpu {
-  name :: Text
-, cores :: Int
-, threads :: Int
-, vendor :: Maybe Text
-, family :: Maybe Text
-, model :: Maybe Text
-, stepping :: Maybe Text
-} deriving (Eq, Ord, Show, Generic)
 
 getCpuInfo :: IO Cpu
 getCpuInfo = do
