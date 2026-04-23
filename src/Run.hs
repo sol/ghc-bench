@@ -4,11 +4,12 @@ import Imports
 
 import Data.List qualified as List
 import Data.Text.IO (putStr, putStrLn)
+import System.IO (hFlush, stdout)
 import System.Directory (getTemporaryDirectory, createDirectoryIfMissing)
 import System.Exit (die)
 
 import Command qualified
-import SystemInfo (Concurrency)
+import SystemInfo (SystemInfo, Concurrency)
 import SystemInfo qualified
 import Blob (Blob(..))
 import Blob qualified
@@ -46,6 +47,11 @@ ghciPackage = "containers-0.8"
 parseOptions :: [FilePath] -> (Bool, [FilePath])
 parseOptions = first (not . null) . List.partition (== "--dry-run")
 
+info :: SystemInfo -> IO ()
+info system = do
+  putStr . unlines $ "" : SystemInfo.pretty system
+  hFlush stdout
+
 main :: [String] -> IO ()
 main (parseOptions -> (dryRun, args)) = do
 
@@ -58,7 +64,7 @@ main (parseOptions -> (dryRun, args)) = do
   system <- SystemInfo.collect
   concurrency <- SystemInfo.nproc
 
-  putStr . unlines $ "" : SystemInfo.pretty system
+  info system
 
   times <- run baseDir (withTempDirectory baseDir "build") dryRun args stage0 concurrency
   unless (null times) do

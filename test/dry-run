@@ -12,11 +12,11 @@ export GHC=/path/to/ghc-9.12.4
 
 tar -xf /tmp/ghc-bench/ghc-9.12.4-src.tar.gz
 cd ghc-9.12.4
-./configure
-hadrian/build --help
+sh configure --enable-tarballs-autodownload
+sh hadrian/build --help
 
 # MEASURE ghc-9.12.4-build
-hadrian/build -j20 --flavour=quickest
+sh hadrian/build -j20 --flavour=quickest
 
 
 ############################################
