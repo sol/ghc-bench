@@ -4,7 +4,7 @@ import Imports
 
 import Data.List qualified as List
 import Data.Text.IO (putStr, putStrLn)
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (getTemporaryDirectory, createDirectoryIfMissing)
 import System.Exit (die)
 
 import Command qualified
@@ -27,14 +27,11 @@ version = "9.12.4"
 ghc :: FilePath
 ghc = "ghc-" <> version
 
-baseDir :: FilePath
-baseDir = "/tmp/ghc-bench"
-
-sourceTarball :: Tarball
-sourceTarball = Tarball {
+sourceTarball :: FilePath -> Tarball
+sourceTarball dir = Tarball {
     blob = Blob {
       url = "https://downloads.haskell.org/~ghc/" <> version <> "/ghc-" <> version <> "-src.tar.gz"
-    , path = baseDir </> "ghc-" <> version <> "-src.tar.gz"
+    , path = dir </> "ghc-" <> version <> "-src.tar.gz"
     , hash = "078e0272f52407601e24f054a1efc2c5"
     }
   , root = "ghc-" <> version
@@ -51,17 +48,19 @@ parseOptions = first (not . null) . List.partition (== "--dry-run")
 
 main :: [String] -> IO ()
 main (parseOptions -> (dryRun, args)) = do
+
+  baseDir <- getTemporaryDirectory <&> (</> "ghc-bench")
+  createDirectoryIfMissing False baseDir
+
   Blob.requireAll
   SystemInfo.requireAll
-
   stage0 <- Command.resolve ghc
-  createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- SystemInfo.nproc
 
   putStr . unlines $ "" : SystemInfo.pretty system
 
-  times <- run (withTempDirectory baseDir "build") dryRun args stage0 concurrency
+  times <- run baseDir (withTempDirectory baseDir "build") dryRun args stage0 concurrency
   unless (null times) do
     putStrLn "\ntimes:"
     for_ times \ (Label name, time) -> do
@@ -72,12 +71,15 @@ main (parseOptions -> (dryRun, args)) = do
 
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
-run :: WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
-run withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
+run :: FilePath -> WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
+run baseDir withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
   [name] | Just action <- lookup name actions -> action
   _ -> die usage
   where
+    source :: Tarball
+    source = sourceTarball baseDir
+
     requireDependencies :: IO ()
     requireDependencies = for_ dependencies Command.require
 
@@ -86,7 +88,7 @@ run withTemp dryRun args stage0 concurrency = requireDependencies >> case args o
 
     benchmarkActions :: [(String, Benchmark ())]
     benchmarkActions = [
-        ("ghc", withLabel ghc $ BuildGhc.run sourceTarball stage0 concurrency)
+        ("ghc", withLabel ghc $ BuildGhc.run source stage0 concurrency)
       , ("cabal", withLabel cabalPackage $ BuildCabalPackage.run cabalPackage ghc concurrency)
       , ("ghci", withLabel ghciPackage $ Ghci.run ghciPackage ghc concurrency)
       ]
