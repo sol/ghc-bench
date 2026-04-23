@@ -7,10 +7,11 @@ import Data.Text.IO (putStr, putStrLn)
 import System.Directory (createDirectoryIfMissing)
 import System.Exit (die)
 
-import Command (Concurrency, nproc)
 import Command qualified
+import SystemInfo (Concurrency)
 import SystemInfo qualified
 import Blob (Blob(..))
+import Blob qualified
 import Result (Result(..), Label(..), Seconds)
 import Result qualified
 import Benchmark.Type (Benchmark, withLabel)
@@ -50,11 +51,13 @@ parseOptions = first (not . null) . List.partition (== "--dry-run")
 
 main :: [String] -> IO ()
 main (parseOptions -> (dryRun, args)) = do
-  Command.requireAll
+  Blob.requireAll
+  SystemInfo.requireAll
+
   stage0 <- Command.resolve ghc
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
-  concurrency <- nproc
+  concurrency <- SystemInfo.nproc
 
   putStr . unlines $ "" : SystemInfo.pretty system
 

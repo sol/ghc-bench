@@ -1,5 +1,6 @@
 module Blob (
-  download
+  requireAll
+, download
 , Blob(..)
 ) where
 
@@ -8,7 +9,7 @@ import Imports
 import GHC.Fingerprint (getFileHash)
 import System.Directory (doesFileExist, renameFile)
 
-import Command (curl)
+import Command qualified
 
 data Blob = Blob {
   url :: FilePath
@@ -38,3 +39,10 @@ verify Blob {..} = do
     , "  expected: " <> hash
     , "  actual:   " <> actual
     ]
+
+requireAll :: IO ()
+requireAll = do
+  Command.require "curl"
+
+curl :: [String] -> IO ()
+curl = Command.call "curl"

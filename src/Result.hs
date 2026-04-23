@@ -25,7 +25,6 @@ import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
 
 import Benchmark.Type (Label(..), Seconds(..))
-import Command (Concurrency(..))
 import SystemInfo
 
 base :: ByteString

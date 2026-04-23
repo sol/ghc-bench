@@ -28,8 +28,7 @@ import Control.Monad.Trans.Writer.CPS qualified as Writer
 
 import Blob (Blob)
 import Blob qualified
-import Command hiding (callWith)
-import Command qualified
+import Command (Env(..), callWith)
 
 newtype Label = Label Text
   deriving newtype (Eq, Show, Ord, IsString)

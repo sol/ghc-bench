@@ -16,8 +16,8 @@ module Benchmark.Util (
 
 import Prelude as Imports
 
+import SystemInfo (Concurrency)
 import Benchmark.Type
-import Command (Concurrency)
 
 tar :: [String] -> Benchmark ()
 tar = call "tar"
