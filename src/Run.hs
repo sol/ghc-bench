@@ -3,7 +3,7 @@ module Run (main, run) where
 import Imports
 
 import Data.List qualified as List
-import Data.Text.IO (putStrLn)
+import Data.Text.IO (putStr, putStrLn)
 import System.Directory (createDirectoryIfMissing)
 import System.Exit (die)
 
@@ -55,6 +55,9 @@ main (parseOptions -> (dryRun, args)) = do
   createDirectoryIfMissing False baseDir
   system <- SystemInfo.collect
   concurrency <- nproc
+
+  putStr . unlines $ "" : SystemInfo.pretty system
+
   times <- run (withTempDirectory baseDir "build") dryRun args stage0 concurrency
   unless (null times) do
     putStrLn "\ntimes:"
@@ -69,7 +72,7 @@ type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 run :: WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
 run withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
-  [name] | Just action <- lookup name subcommands -> action
+  [name] | Just action <- lookup name actions -> action
   _ -> die usage
   where
     requireDependencies :: IO ()
@@ -91,14 +94,8 @@ run withTemp dryRun args stage0 concurrency = requireDependencies >> case args o
     actions :: [(String, IO [(Label, Seconds)])]
     actions = map (fmap $ withTemp . runBenchmark dryRun) benchmarkActions
 
-    subcommands :: [(FilePath, IO [(Label, Seconds)])]
-    subcommands = actions ++ [
-        ("all", runAll)
-      , ("info", return [("info", 0)])
-      ]
-
     usage :: FilePath
-    usage = "usage: ghc-bench [ " <> List.intercalate " | " (map fst subcommands) <> " ] [ --dry-run ]"
+    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ]"
 
 runBenchmark :: Bool -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
 runBenchmark dryRun action dir

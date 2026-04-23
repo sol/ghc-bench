@@ -1,10 +1,10 @@
 module Imports (module Imports) where
 
-import Prelude as Imports hiding (read, show, lines, unlines, words, unwords, error, putStrLn)
+import Prelude as Imports hiding (read, show, lines, unlines, words, unwords, error, putStr, putStrLn)
 
 import Data.Maybe as Imports
-
 import Data.String as Imports (IsString(..))
+import Data.Function as Imports ((&))
 import Data.Functor as Imports hiding (unzip)
 import Data.Bifunctor as Imports (Bifunctor(..))
 import Control.Arrow as Imports ((>>>))

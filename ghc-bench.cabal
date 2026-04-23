@@ -35,6 +35,7 @@ executable ghc-bench
       Result
       Run
       SystemInfo
+      SystemInfo.Type
   hs-source-dirs:
       src
       driver
@@ -77,6 +78,7 @@ test-suite spec
       Result
       Run
       SystemInfo
+      SystemInfo.Type
       CommandSpec
       Fixtures.System
       Helper
