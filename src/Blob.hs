@@ -5,9 +5,10 @@ module Blob (
 
 import Imports
 
+import GHC.Fingerprint (getFileHash)
 import System.Directory (doesFileExist, renameFile)
 
-import Command (curl, sha256sum)
+import Command (curl)
 
 data Blob = Blob {
   url :: FilePath
@@ -28,9 +29,9 @@ ensure url path = unless -< doesFileExist path $ do
 
 verify :: Blob -> IO ()
 verify Blob {..} = do
-  actual <- sha256sum path
+  actual <- show <$> getFileHash path
   when (actual /= hash) . error $ unlines [
-      "sha256sum mismatch!"
+      "hash mismatch!"
     , ""
     , "  url:      " <> pack url
     , "  file:     " <> pack path
