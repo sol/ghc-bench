@@ -9,7 +9,6 @@ module Command (
 , uname
 , free
 , lscpu
-, sha256sum
 , nproc
 
 , curl
@@ -48,9 +47,6 @@ free = run "free"
 lscpu :: [String] -> IO Text
 lscpu = run "lscpu"
 
-sha256sum :: String -> IO Text
-sha256sum file = T.take 64 <$> run "sha256sum" [file]
-
 nproc :: IO Concurrency
 nproc = read <$> readProcess "nproc" [] ""
 
@@ -64,7 +60,6 @@ requireAll = do
   require "uname"
   require "free"
   require "lscpu"
-  require "sha256sum"
   require "nproc"
   require "curl"
 

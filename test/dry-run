@@ -8,7 +8,7 @@ export GHC=/path/to/ghc-9.12.4
 
 # Ensure that /tmp/ghc-bench/ghc-9.12.4-src.tar.gz exists; download if necessary.
 # url: https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-src.tar.gz
-# sha256: df71d96169056d3a6d7ec17498864cbdd5511bda196440dc38a692133833dfa4
+# hash: 078e0272f52407601e24f054a1efc2c5
 
 tar -xf /tmp/ghc-bench/ghc-9.12.4-src.tar.gz
 cd ghc-9.12.4

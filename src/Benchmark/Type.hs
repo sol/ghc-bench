@@ -131,7 +131,7 @@ dryRunForest = fmap unlines . runWriter . \ commands -> do
         writeLine ""
         writeLine $ "# Ensure that " <> pack blob.path <> " exists; download if necessary."
         writeLine $ "# url: " <> pack blob.url
-        writeLine $ "# sha256: " <> blob.hash
+        writeLine $ "# hash: " <> blob.hash
         writeLine ""
         return []
 
