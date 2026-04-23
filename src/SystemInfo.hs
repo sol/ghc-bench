@@ -1,10 +1,14 @@
 module SystemInfo (
   collect
 , pretty
+, requireAll
 , SystemInfo(..)
 , Product(..)
 , Board(..)
 , Cpu(..)
+
+, Concurrency(..)
+, nproc
 ) where
 
 import Imports hiding (product)
@@ -16,11 +20,11 @@ import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
 
 import SystemInfo.Type
-import Command (eval, uname, lscpu, free, awk)
+import Command qualified
 
 collect :: IO SystemInfo
 collect = do
-  os <- eval ". /etc/os-release && echo $NAME || uname" <&> strip
+  os <- getOsName
   arch <- uname ["-m"]
   vendor <- fromFile "/sys/class/dmi/id/sys_vendor"
   product <- getProductInfo
@@ -99,3 +103,33 @@ fromFile :: FilePath -> IO Text
 fromFile p = try @IOException (Utf8.readFile p) <&> \ case
   Left _ -> "unknown"
   Right c -> strip c
+
+requireAll :: IO ()
+requireAll = do
+  Command.require "bash"
+  Command.require "awk"
+  Command.require "uname"
+  Command.require "free"
+  Command.require "lscpu"
+  Command.require "nproc"
+
+getOsName :: IO Text
+getOsName = Command.run "bash" ["-c", ". /etc/os-release && echo $NAME || uname"] <&> strip
+
+awk :: Text -> Text -> IO Text
+awk command = Command.readProcess "awk" [unpack command]
+
+uname :: [String] -> IO Text
+uname args = Command.run "uname" args <&> T.strip
+
+free :: [String] -> IO Text
+free = Command.run "free"
+
+lscpu :: [String] -> IO Text
+lscpu = Command.run "lscpu"
+
+newtype Concurrency = Concurrency Int
+  deriving newtype (Eq, Ord, Show, Read, Num)
+
+nproc :: IO Concurrency
+nproc = read <$> Command.readProcess "nproc" [] ""

@@ -1,20 +1,11 @@
 module Command (
-  requireAll
-, require
+  require
 , resolve
 
-, eval
+, run
+, readProcess
 
-, awk
-, uname
-, free
-, lscpu
-, nproc
-
-, curl
-
-, Concurrency(..)
-
+, call
 , callWith
 , Env(..)
 , chdir
@@ -28,40 +19,6 @@ import Data.Text qualified as T
 import System.Environment (getEnvironment)
 import System.Process hiding (readProcess, callProcess)
 import System.Process qualified as Process
-
-newtype Concurrency = Concurrency Int
-  deriving newtype (Eq, Ord, Show, Read, Num)
-
-eval :: String -> IO Text
-eval command = run "bash" ["-c", command]
-
-awk :: Text -> Text -> IO Text
-awk command = readProcess "awk" [unpack command]
-
-uname :: [String] -> IO Text
-uname args = run "uname" args <&> T.strip
-
-free :: [String] -> IO Text
-free = run "free"
-
-lscpu :: [String] -> IO Text
-lscpu = run "lscpu"
-
-nproc :: IO Concurrency
-nproc = read <$> readProcess "nproc" [] ""
-
-curl :: [String] -> IO ()
-curl = call "curl"
-
-requireAll :: IO ()
-requireAll = do
-  require "bash"
-  require "awk"
-  require "uname"
-  require "free"
-  require "lscpu"
-  require "nproc"
-  require "curl"
 
 require :: FilePath -> IO ()
 require = void . resolve
