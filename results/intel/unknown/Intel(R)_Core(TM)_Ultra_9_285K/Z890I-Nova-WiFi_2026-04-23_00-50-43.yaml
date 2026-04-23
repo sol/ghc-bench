@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 4
+  ghc-9.12.4-build: 388
+  hedgehog-1.7-build: 10
+  hedgehog-1.7-dependencies: 17
+concurrency: 24
+system:
+  os: Ubuntu
+  arch: x86_64
+  vendor: ASRock
+  product:
+    category: desktop
+    chassis_type: '3'
+    name: Z890I Nova WiFi
+    family: To Be Filled By O.E.M.
+    version: To Be Filled By O.E.M.
+  board:
+    name: WiFi
+    vendor: ASRock Z890I Nova
+  cpu:
+    name: Intel(R) Core(TM) Ultra 9 285K
+    cores: 24
+    threads: 24
+    vendor: GenuineIntel
+    family: '6'
+    model: '198'
+    stepping: '2'
+  ram: 92

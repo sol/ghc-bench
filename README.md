@@ -4,6 +4,7 @@
 
 | CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs) | [containers-0.8-ghci](src/Benchmark/Ghci.hs) |
 | --- | --- | --- | --- | --- |
+| [Intel Core Ultra 9 285K](results/intel/unknown/Intel(R)_Core(TM)_Ultra_9_285K) | 388s (6m 28s) | 17s | 10s | 4s |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s | 5s |
 | [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) | 661s (11m 1s) | 27s | 21s | 7s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
