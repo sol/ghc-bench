@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:388 hedgehog-1.7-dependencies:17 hedgehog-1.7-build:10 containers-0.8-ghci:4
+
+### Used number of threads
+
+24
+
+### CPU Name
+
+Intel(R) Core(TM) Ultra 9 285K
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 198 / 2
+
+### Cores
+
+24
+
+### Threads
+
+24
+
+### Operating System
+
+Ubuntu
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+ASRock Z890I Nova WiFi
+
+### RAM Size (GB)
+
+92
+
+### System Vendor
+
+ASRock
+
+### Product Category
+
+desktop
+
+### Chassis Type
+
+3
+
+### Product Family
+
+To Be Filled By O.E.M.
+
+### Product Name
+
+Z890I Nova WiFi
+
+### Product Version
+
+To Be Filled By O.E.M.
