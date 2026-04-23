@@ -34,10 +34,12 @@ jobs:
       - run: cabal update
       - run: cabal build all --dry-run -v0
 
-      - run: echo "version=`ghc --numeric-version`" >> $GITHUB_OUTPUT
+      - run: echo "version=$(ghc --numeric-version)" >> $GITHUB_OUTPUT
+        shell: bash
         id: ghc
 
-      - run: echo "store-dir=`cabal -v0 path --store-dir`" >> $GITHUB_OUTPUT
+      - run: echo "store-dir=$(cabal -v0 path --store-dir)" >> $GITHUB_OUTPUT
+        shell: bash
         id: cabal-path
 
       - uses: actions/cache/restore@v5
