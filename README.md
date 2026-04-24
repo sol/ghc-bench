@@ -6,6 +6,7 @@
 | --- | --- | --- | --- | --- |
 | [Intel Core Ultra 9 285K](results/intel/core_ultra_series_2/285K) | 388s (6m 28s) | 17s | 10s | 4s |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 526s (8m 46s) | 28s | 13s | 5s |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 588s (9m 48s) | 29s | 15s | 6s |
 | [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) | 661s (11m 1s) | 27s | 21s | 7s |
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
 | [AMD Ryzen 5 5600X](results/unknown/unknown/AMD_Ryzen_5_5600X) | 730s (12m 10s) | 35s | 16s | 7s |

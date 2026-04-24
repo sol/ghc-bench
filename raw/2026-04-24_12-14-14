@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:588 hedgehog-1.7-dependencies:29 hedgehog-1.7-build:15 containers-0.8-ghci:6
+
+### Used number of threads
+
+10
+
+### CPU Name
+
+Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 165 / 5
+
+### Cores
+
+10
+
+### Threads
+
+10
+
+### Operating System
+
+Debian GNU/Linux
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+unknown unknown
+
+### RAM Size (GB)
+
+24
+
+### System Vendor
+
+QEMU
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+1
+
+### Product Family
+
+_No response_
+
+### Product Name
+
+Standard PC (Q35 + ICH9, 2009)
+
+### Product Version
+
+pc-q35-10.2
