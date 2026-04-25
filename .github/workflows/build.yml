@@ -19,61 +19,51 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-        ghc:
-          - '9.10'
-          - '9.12'
-          - '9.14'
+        include:
+          - os: windows-latest
+            ghc: 9.12.4
     steps:
+
       - uses: actions/checkout@v5
       - uses: hspec/setup-haskell@v1
         with:
           ghc-version: ${{ matrix.ghc }}
+      - run: rm cabal.project
 
-      - run: cabal update
-      - run: cabal build all --dry-run -v0
-
-      - run: echo "version=$(ghc --numeric-version)" >> $GITHUB_OUTPUT
-        shell: bash
-        id: ghc
-
-      - run: echo "store-dir=$(cabal -v0 path --store-dir)" >> $GITHUB_OUTPUT
-        shell: bash
-        id: cabal-path
-
-      - uses: actions/cache/restore@v5
-        id: cache
-        env:
-          key: ${{ runner.os }}-ghc-${{ steps.ghc.outputs.version }}
+      - uses: msys2/setup-msys2@v2
         with:
-          path: ${{ steps.cabal-path.outputs.store-dir }}
-          key: ${{ env.key }}-${{ hashFiles('dist-newstyle/cache/plan.json') }}
-          restore-keys: ${{ env.key }}-
+          update: true
+          install: >-
+            git tar bsdtar binutils autoconf make xz zstd
+            curl automake p7zip patch m4
+            mingw-w64-clang-x86_64-ca-certificates
+            mingw-w64-clang-x86_64-gcc
+            mingw-w64-clang-x86_64-python3
+            mingw-w64-clang-x86_64-python-sphinx
+            mingw-w64-clang-x86_64-tools-git
+            mingw-w64-clang-x86_64-ca-certificates
+      - run: C:\msys64\msys2_shell.cmd -mingw64 -use-full-path -defterm -no-start -here -c 'echo $PATH'
+      - run: C:\msys64\msys2_shell.cmd -mingw64 -use-full-path -defterm -no-start -here -c 'echo $PATH'
 
-      - run: cabal build all --only-dependencies
+      - name: Get sources
+      - run: |
+          curl "https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-src.tar.gz" -o ghc-9.12.4-src.tar.gz
+          curl "https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-windows-extra-src.tar.gz" -o ghc-9.12.4-windows-extra-src.tar.gz
+          curl "https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-testsuite.tar.gz" -o ghc-9.12.4-testsuite.tar.gz
+          tar -xf ghc-9.12.4-src.tar.gz
+          tar -xf ghc-9.12.4-windows-extra-src.tar.gz
+          tar -xf ghc-9.12.4-testsuite.tar.gz
 
-      - uses: actions/cache/save@v5
-        with:
-          path: ${{ steps.cabal-path.outputs.store-dir }}
-          key: ${{ steps.cache.outputs.cache-primary-key }}
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Configure
+        run: C:\msys64\msys2_shell.cmd -mingw64 -use-full-path -defterm -no-start -here -c './configure --enable-tarballs-autodownload'
+        working-directory: ghc-9.12.4
 
-      - run: cabal build all
-      - run: cabal test spec --test-show-details=direct
+      - name: Make sure that Hadrian is built
+        run: |
+          cabal update
+          C:\msys64\msys2_shell.cmd -mingw64 -use-full-path -defterm -no-start -here -c 'hadrian/build.bat -j4 --help'
+        working-directory: ghc-9.12.4
 
-  success:
-    needs: build
-    runs-on: ubuntu-latest
-    if: always() # this is required as GitHub considers "skipped" jobs as "passed" when checking branch protection rules
-
-    steps:
-      - run: false
-        if: needs.build.result != 'success'
-
-      - uses: actions/checkout@v4
-      - name: Check for trailing whitespace
-        run: '! git grep -I "\s\+$"'
-
-      - run: curl -sSL https://raw.githubusercontent.com/sol/hpack/main/get-hpack.sh | bash
-      - run: hpack && git diff --exit-code
+      - name: Build GHC
+        run: C:\msys64\msys2_shell.cmd -mingw64 -use-full-path -defterm -no-start -here -c 'hadrian/build.bat -j4 --flavour=quickest'
+        working-directory: ghc-9.12.4

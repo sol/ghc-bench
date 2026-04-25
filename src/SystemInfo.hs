@@ -19,20 +19,55 @@ import Control.Exception
 import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
 
+import System.Info qualified as System
+
 import SystemInfo.Type
 import Command qualified
 
 collect :: IO SystemInfo
-collect = do
-  os <- getOsName
-  arch <- uname ["-m"]
-  vendor <- fromFile "/sys/class/dmi/id/sys_vendor"
-  product <- getProductInfo
-  board <- getBoardInfo
-  cpu <- getCpuInfo
-  ram <- free ["-b"] >>= awk "/Mem:/ {print $2}" <&> toGb . read . strip
-  return SystemInfo {..}
+collect = case System.os of
+  "mingw32" -> windows
+  _ -> linux
   where
+    windows :: IO SystemInfo
+    windows = return SystemInfo {
+        os = "unknown"
+      , arch = "unknown"
+      , vendor = "unknown"
+      , product = Product {
+          category = "unknown"
+        , chassis_type = "unknown"
+        , family = "unknown"
+        , name = "unknown"
+        , version = "unknown"
+        }
+      , board = Board {
+          vendor = "unknown"
+        , name = "unknown"
+        }
+      , cpu = Cpu {
+          name = "unknown"
+        , cores = 0
+        , threads = 0
+        , vendor = Nothing
+        , family = Nothing
+        , model = Nothing
+        , stepping = Nothing
+        }
+      , ram = 0
+      }
+
+    linux :: IO SystemInfo
+    linux = do
+      os <- getOsName
+      arch <- uname ["-m"]
+      vendor <- fromFile "/sys/class/dmi/id/sys_vendor"
+      product <- getProductInfo
+      board <- getBoardInfo
+      cpu <- getCpuInfo
+      ram <- free ["-b"] >>= awk "/Mem:/ {print $2}" <&> toGb . read . strip
+      return SystemInfo {..}
+
     toGb :: Int -> Int
     toGb bytes = case ceiling @Double $ fromIntegral bytes / 1024 / 1024 / 1024 of
       31 -> 32 -- adjust for reserved ram that is not visible to the os
@@ -109,8 +144,8 @@ requireAll = do
   Command.require "bash"
   Command.require "awk"
   Command.require "uname"
-  Command.require "free"
-  Command.require "lscpu"
+  -- Command.require "free"
+  -- Command.require "lscpu"
   Command.require "nproc"
 
 getOsName :: IO Text

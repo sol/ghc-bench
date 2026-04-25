@@ -15,9 +15,10 @@ run tarball stage0 concurrency = setEnv "GHC" stage0 do
   download tarball.blob
   tar ["-xf", tarball.blob.path]
   cd tarball.root do
-    call "./configure" []
+    call "sh" ["configure", "--enable-tarballs-autodownload"]
     hadrian ["--help"] -- this makes sure that building hadrian dependencies is not measured
     measure "build" do
       hadrian ["-j" <> show concurrency, "--flavour=quickest"]
   where
-    hadrian = call "hadrian/build"
+    hadrian :: [String] -> Benchmark ()
+    hadrian = call "sh" . (:) "hadrian/build"
