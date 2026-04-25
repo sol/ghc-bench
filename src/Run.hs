@@ -4,7 +4,7 @@ import Imports
 
 import Data.List qualified as List
 import Data.Text.IO (putStr, putStrLn)
-import System.Directory (getTemporaryDirectory, createDirectoryIfMissing)
+import System.Directory (getXdgDirectory, XdgDirectory(..), getTemporaryDirectory, createDirectoryIfMissing)
 import System.Exit (die)
 
 import Command qualified
@@ -49,6 +49,8 @@ parseOptions = first (not . null) . List.partition (== "--dry-run")
 main :: [String] -> IO ()
 main (parseOptions -> (dryRun, args)) = do
 
+  cacheDir <- getXdgDirectory XdgCache "ghc-bench"
+  createDirectoryIfMissing True cacheDir
   baseDir <- getTemporaryDirectory <&> (</> "ghc-bench")
   createDirectoryIfMissing False baseDir
 
@@ -60,7 +62,7 @@ main (parseOptions -> (dryRun, args)) = do
 
   putStr . unlines $ "" : SystemInfo.pretty system
 
-  times <- run baseDir (withTempDirectory baseDir "build") dryRun args stage0 concurrency
+  times <- run cacheDir (withTempDirectory baseDir "build") dryRun args stage0 concurrency
   unless (null times) do
     putStrLn "\ntimes:"
     for_ times \ (Label name, time) -> do
@@ -72,13 +74,13 @@ main (parseOptions -> (dryRun, args)) = do
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
 run :: FilePath -> WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
-run baseDir withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
+run cacheDir withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
   [name] | Just action <- lookup name actions -> action
   _ -> die usage
   where
     source :: Tarball
-    source = sourceTarball baseDir
+    source = sourceTarball cacheDir
 
     requireDependencies :: IO ()
     requireDependencies = for_ dependencies Command.require
