@@ -6,11 +6,11 @@
 cd <sandbox>
 export GHC=/path/to/ghc-9.12.4
 
-# Ensure that /tmp/ghc-bench/ghc-9.12.4-src.tar.gz exists; download if necessary.
+# Ensure that ~/.cache/ghc-bench/ghc-9.12.4-src.tar.gz exists; download if necessary.
 # url: https://downloads.haskell.org/~ghc/9.12.4/ghc-9.12.4-src.tar.gz
 # hash: 078e0272f52407601e24f054a1efc2c5
 
-tar -xf /tmp/ghc-bench/ghc-9.12.4-src.tar.gz
+tar -xf ~/.cache/ghc-bench/ghc-9.12.4-src.tar.gz
 cd ghc-9.12.4
 ./configure
 hadrian/build --help

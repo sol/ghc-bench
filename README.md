@@ -92,14 +92,14 @@ Benchmark results are then processed by a GitHub Action.
 Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
 
 - `ghc-bench` creates a separate temporary directory for each benchmark run under `/tmp/ghc-bench` and always cleans up after itself.
-- The GHC 9.12.4 source tarball is stored at `/tmp/ghc-bench/ghc-9.12.4-src.tar.gz` and reused between benchmark runs (and users).
+- The GHC 9.12.4 source tarball is stored at `~/.cache/ghc-bench/ghc-9.12.4-src.tar.gz` and reused between benchmark runs.
 - `cabal` is used to build Hadrian (the GHC build system)
   - any missing Hadrian dependencies are installed to `~/.local/state/cabal/store`;
-    this is the only situation where running `ghc-bench` may modify anything outside of `/tmp/ghc-bench`
+    apart from the GHC tarball, this is the only other situation where running `ghc-bench` may modify anything outside of `/tmp/ghc-bench`
 
 Exact steps performed by `ghc-bench`:
 
-1. Download the GHC 9.12.4 source tarball to `/tmp/ghc-bench/ghc-9.12.4-src.tar.gz`
+1. Download the GHC 9.12.4 source tarball to `~/.cache/ghc-bench/ghc-9.12.4-src.tar.gz`
 1. Unpack GHC sources into a temporary directory under `/tmp/ghc-bench`
 1. Set the environment variable `GHC` to the absolute path of `ghc-9.12.4`
 1. Run `./configure`
