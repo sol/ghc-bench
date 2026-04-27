@@ -1,4 +1,11 @@
-module Run (main, run) where
+module Run (
+  main
+
+, DryRun(..)
+, PrintQR(..)
+, parseOptions
+, run
+) where
 
 import Imports
 
@@ -43,16 +50,41 @@ cabalPackage = "hedgehog-1.7"
 ghciPackage :: FilePath
 ghciPackage = "containers-0.8"
 
-parseOptions :: [FilePath] -> (Bool, [FilePath])
-parseOptions = first (not . null) . List.partition (== "--dry-run")
+data DryRun = NoDryRun | DryRun
+  deriving (Eq, Show, Bounded)
+
+data PrintQR = NoPrintQR | PrintQR
+  deriving (Eq, Show, Bounded)
+
+parseOptions :: [FilePath] -> (DryRun, (PrintQR, [FilePath]))
+parseOptions = fmap parsePrintQR . parseDryRun
+
+parseDryRun :: [FilePath] -> (DryRun, [FilePath])
+parseDryRun = parseOption "dry-run"
+
+parsePrintQR :: [FilePath] -> (PrintQR, [FilePath])
+parsePrintQR = parseOption "qr"
+
+parseOption :: Bounded a => String -> [String] -> (a, [String])
+parseOption name = List.partition (== "--" <> name) >>> first \ case
+  [] -> minBound
+  _ -> maxBound
 
 main :: [String] -> IO ()
-main (parseOptions -> (dryRun, args)) = do
+main (parseOptions -> (dryRun, (printQR, args))) = do
 
   cacheDir <- getXdgDirectory XdgCache "ghc-bench"
   createDirectoryIfMissing True cacheDir
   baseDir <- getTemporaryDirectory <&> (</> "ghc-bench")
   createDirectoryIfMissing False baseDir
+
+  qrencode <- case printQR of
+    NoPrintQR -> do
+      return Nothing
+    PrintQR -> do
+      let command = "qrencode"
+      Command.require command
+      return $ Just (\ url -> Command.call command ["-t", "ANSIUTF8", url])
 
   Blob.requireAll
   SystemInfo.requireAll
@@ -69,11 +101,11 @@ main (parseOptions -> (dryRun, args)) = do
       putStrLn $ "  " <> name <> ": " <> (Result.formatTime time)
 
     putStrLn ""
-    Result.submit Result {..}
+    Result.submit Result {..} qrencode
 
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
-run :: FilePath -> WithTempDirectory -> Bool -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
+run :: FilePath -> WithTempDirectory -> DryRun -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
 run cacheDir withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
   [name] | Just action <- lookup name actions -> action
@@ -104,7 +136,7 @@ run cacheDir withTemp dryRun args stage0 concurrency = requireDependencies >> ca
     usage :: FilePath
     usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ]"
 
-runBenchmark :: Bool -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
-runBenchmark dryRun action dir
-  | dryRun = Benchmark.dryRun $ Benchmark.cd dir action
-  | otherwise = Benchmark.run $ Benchmark.cd dir action
+runBenchmark :: DryRun -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
+runBenchmark dryRun action dir = case dryRun of
+  NoDryRun -> Benchmark.run $ Benchmark.cd dir action
+  DryRun -> Benchmark.dryRun $ Benchmark.cd dir action
