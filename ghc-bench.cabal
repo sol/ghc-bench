@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           ghc-bench
-version:        0.3.1
+version:        0.3.2
 synopsis:       Benchmark a Haskell development system
 description:    See the README at <https://github.com/sol/ghc-bench#readme>
 category:       Development

@@ -20,6 +20,7 @@ import Imports hiding (product)
 import Prelude qualified
 
 import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 import Data.ByteString.Char8 (ByteString, putStrLn)
 import System.FilePath (joinPath)
 import Network.HTTP.Types.URI (renderSimpleQuery)
@@ -36,10 +37,14 @@ data Result = Result {
 , system :: SystemInfo
 } deriving (Eq, Show, Generic)
 
-submit :: Result -> IO ()
-submit result = do
-  putStrLn "Open this URL to submit your result:"
-  putStrLn $ "\n  " <> issueUrl result
+submit :: Result -> (Maybe (FilePath -> IO ())) -> IO ()
+submit (issueUrl -> url) = \ case
+  Nothing -> do
+    putStrLn "Open this URL to submit your result:\n"
+    putStrLn $ "  " <> url
+  Just qrencode -> do
+    putStrLn "Open this URL to submit your result:\n"
+    qrencode (unpack $ T.decodeUtf8Lenient url)
 
 issueUrl :: Result -> ByteString
 issueUrl result = base <> renderQuery [
