@@ -2,6 +2,7 @@ module Run (
   main
 
 , DryRun(..)
+, Prepare(..)
 , PrintQR(..)
 , parseOptions
 , run
@@ -53,14 +54,20 @@ ghciPackage = "containers-0.8"
 data DryRun = NoDryRun | DryRun
   deriving (Eq, Show, Bounded)
 
+data Prepare = NoPrepare | Prepare
+  deriving (Eq, Show, Bounded)
+
 data PrintQR = NoPrintQR | PrintQR
   deriving (Eq, Show, Bounded)
 
-parseOptions :: [FilePath] -> (DryRun, (PrintQR, [FilePath]))
-parseOptions = fmap parsePrintQR . parseDryRun
+parseOptions :: [FilePath] -> (DryRun, (Prepare, (PrintQR, [FilePath])))
+parseOptions = fmap (fmap parsePrintQR) . fmap parsePrepare . parseDryRun
 
 parseDryRun :: [FilePath] -> (DryRun, [FilePath])
 parseDryRun = parseOption "dry-run"
+
+parsePrepare :: [FilePath] -> (Prepare, [FilePath])
+parsePrepare = parseOption "prepare"
 
 parsePrintQR :: [FilePath] -> (PrintQR, [FilePath])
 parsePrintQR = parseOption "qr"
@@ -71,7 +78,7 @@ parseOption name = List.partition (== "--" <> name) >>> first \ case
   _ -> maxBound
 
 main :: [String] -> IO ()
-main (parseOptions -> (dryRun, (printQR, args))) = do
+main (parseOptions -> (dryRun, (prepare, (printQR, args)))) = do
 
   cacheDir <- getXdgDirectory XdgCache "ghc-bench"
   createDirectoryIfMissing True cacheDir
@@ -94,7 +101,7 @@ main (parseOptions -> (dryRun, (printQR, args))) = do
 
   putStr . unlines $ "" : SystemInfo.pretty system
 
-  times <- run cacheDir (withTempDirectory baseDir "build") dryRun args stage0 concurrency
+  times <- run cacheDir (withTempDirectory baseDir "build") dryRun prepare args stage0 concurrency
   unless (null times) do
     putStrLn "\ntimes:"
     for_ times \ (Label name, time) -> do
@@ -105,8 +112,8 @@ main (parseOptions -> (dryRun, (printQR, args))) = do
 
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
-run :: FilePath -> WithTempDirectory -> DryRun -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
-run cacheDir withTemp dryRun args stage0 concurrency = requireDependencies >> case args of
+run :: FilePath -> WithTempDirectory -> DryRun -> Prepare -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
+run cacheDir withTemp dryRun prepare args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
   [name] | Just action <- lookup name actions -> action
   _ -> die usage
@@ -131,12 +138,14 @@ run cacheDir withTemp dryRun args stage0 concurrency = requireDependencies >> ca
     runAll = concat <$> sequence (map snd actions)
 
     actions :: [(String, IO [(Label, Seconds)])]
-    actions = map (fmap $ withTemp . runBenchmark dryRun) benchmarkActions
+    actions = map (fmap $ withTemp . runBenchmark dryRun prepare) benchmarkActions
 
     usage :: FilePath
-    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ]"
+    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ]"
 
-runBenchmark :: DryRun -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
-runBenchmark dryRun action dir = case dryRun of
-  NoDryRun -> Benchmark.run $ Benchmark.cd dir action
-  DryRun -> Benchmark.dryRun $ Benchmark.cd dir action
+runBenchmark :: DryRun -> Prepare -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
+runBenchmark dryRun prepare action dir =
+  case (dryRun, prepare) of
+    (DryRun, _) -> Benchmark.dryRun $ Benchmark.cd dir action
+    (_, Prepare) -> Benchmark.prepare $ Benchmark.cd dir action
+    _ -> Benchmark.run $ Benchmark.cd dir action
