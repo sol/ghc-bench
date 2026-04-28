@@ -122,7 +122,7 @@ prepareForest = map \ case
   Call command args ->
     Call command args
 
-  Measure label commands ->
+  Measure label _ ->
     Measure label []
 
 dryRunForest :: [Command] -> ([(Label, Seconds)], Text)
