@@ -57,7 +57,7 @@ dryRun action = do
   return times
 
 prepare :: Benchmark () -> IO [(Label, Seconds)]
-prepare = execForest . prepareForest . toForest
+prepare = execForest . dropMeasuredCommands . toForest
 
 run :: Benchmark () -> IO [(Label, Seconds)]
 run = execForest . toForest
@@ -108,23 +108,6 @@ collectDependencies = concatMap \ case
   ChangeDirectory _ commands -> collectDependencies commands
   Measure _ commands -> collectDependencies commands
 
-prepareForest :: [Command] -> [Command]
-prepareForest = map \ case
-  SetEnv name value commands ->
-    SetEnv name value (prepareForest commands)
-
-  ChangeDirectory dir commands ->
-    ChangeDirectory dir (prepareForest commands)
-
-  Download blob ->
-    Download blob
-
-  Call command args ->
-    Call command args
-
-  Measure label _ ->
-    Measure label []
-
 dryRunForest :: [Command] -> ([(Label, Seconds)], Text)
 dryRunForest = fmap unlines . runWriter . \ commands -> do
   writeLine ""
@@ -172,6 +155,14 @@ showArg :: String -> Text
 showArg arg
   | any isSpace arg = show arg
   | otherwise = pack arg
+
+dropMeasuredCommands :: [Command] -> [Command]
+dropMeasuredCommands = map \ case
+  SetEnv name value commands -> SetEnv name value (dropMeasuredCommands commands)
+  ChangeDirectory dir commands -> ChangeDirectory dir (dropMeasuredCommands commands)
+  Download blob -> Download blob
+  Call command args -> Call command args
+  Measure label _ -> Measure label []
 
 execForest :: [Command] -> IO [(Label, Seconds)]
 execForest = go mempty

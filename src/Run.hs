@@ -61,7 +61,7 @@ data PrintQR = NoPrintQR | PrintQR
   deriving (Eq, Show, Bounded)
 
 parseOptions :: [FilePath] -> (DryRun, (Prepare, (PrintQR, [FilePath])))
-parseOptions = fmap (fmap parsePrintQR) . fmap parsePrepare . parseDryRun
+parseOptions = (fmap . fmap) parsePrintQR . fmap parsePrepare . parseDryRun
 
 parseDryRun :: [FilePath] -> (DryRun, [FilePath])
 parseDryRun = parseOption "dry-run"
@@ -144,8 +144,7 @@ run cacheDir withTemp dryRun prepare args stage0 concurrency = requireDependenci
     usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ]"
 
 runBenchmark :: DryRun -> Prepare -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
-runBenchmark dryRun prepare action dir =
-  case (dryRun, prepare) of
-    (DryRun, _) -> Benchmark.dryRun $ Benchmark.cd dir action
-    (_, Prepare) -> Benchmark.prepare $ Benchmark.cd dir action
-    _ -> Benchmark.run $ Benchmark.cd dir action
+runBenchmark dryRun prepare action dir = case (dryRun, prepare) of
+  (DryRun, _) -> Benchmark.dryRun $ Benchmark.cd dir action
+  (_, Prepare) -> Benchmark.prepare $ Benchmark.cd dir action
+  _ -> Benchmark.run $ Benchmark.cd dir action
