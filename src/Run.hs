@@ -1,9 +1,9 @@
 module Run (
   main
 
-, DryRun(..)
-, Prepare(..)
-, PrintQR(..)
+, Mode(..)
+, Config(..)
+, defaultConfig
 , parseOptions
 , run
 ) where
@@ -14,6 +14,8 @@ import Data.List qualified as List
 import Data.Text.IO (putStr, putStrLn)
 import System.Directory (getXdgDirectory, XdgDirectory(..), getTemporaryDirectory, createDirectoryIfMissing)
 import System.Exit (die)
+import System.Console.GetOpt
+import System.Console.GetOpt.Util qualified as GetOpt
 
 import Command qualified
 import SystemInfo (Concurrency)
@@ -51,44 +53,42 @@ cabalPackage = "hedgehog-1.7"
 ghciPackage :: FilePath
 ghciPackage = "containers-0.8"
 
-data DryRun = NoDryRun | DryRun
-  deriving (Eq, Show, Bounded)
 
-data Prepare = NoPrepare | Prepare
-  deriving (Eq, Show, Bounded)
+data Mode = DryRun | Prepare | Run
+  deriving (Eq, Show)
 
-data PrintQR = NoPrintQR | PrintQR
-  deriving (Eq, Show, Bounded)
+data Config = Config {
+  mode :: Mode
+, printQR :: Bool
+} deriving (Eq, Show)
 
-parseOptions :: [FilePath] -> (DryRun, (Prepare, (PrintQR, [FilePath])))
-parseOptions = (fmap . fmap) parsePrintQR . fmap parsePrepare . parseDryRun
+defaultConfig :: Config
+defaultConfig = Config {
+    mode = Run
+  , printQR = False
+  }
 
-parseDryRun :: [FilePath] -> (DryRun, [FilePath])
-parseDryRun = parseOption "dry-run"
-
-parsePrepare :: [FilePath] -> (Prepare, [FilePath])
-parsePrepare = parseOption "prepare"
-
-parsePrintQR :: [FilePath] -> (PrintQR, [FilePath])
-parsePrintQR = parseOption "qr"
-
-parseOption :: Bounded a => String -> [String] -> (a, [String])
-parseOption name = List.partition (== "--" <> name) >>> first \ case
-  [] -> minBound
-  _ -> maxBound
+parseOptions :: [String] -> IO (Config, [String])
+parseOptions = GetOpt.evalWithHelp defaultConfig [
+    Option [] ["dry-run"] (NoArg \ c -> c { mode = DryRun }) ""
+  , Option [] ["prepare"] (NoArg \ c -> c { mode = Prepare }) ""
+  , Option [] ["qr"] (NoArg \ c -> c { printQR = True }) ""
+  ]
 
 main :: [String] -> IO ()
-main (parseOptions -> (dryRun, (prepare, (printQR, args)))) = do
+main argv = do
+
+  (config, args) <- parseOptions argv
 
   cacheDir <- getXdgDirectory XdgCache "ghc-bench"
   createDirectoryIfMissing True cacheDir
   baseDir <- getTemporaryDirectory <&> (</> "ghc-bench")
   createDirectoryIfMissing False baseDir
 
-  qrencode <- case printQR of
-    NoPrintQR -> do
+  qrencode <- case config.printQR of
+    False -> do
       return Nothing
-    PrintQR -> do
+    True -> do
       let command = "qrencode"
       Command.require command
       return $ Just (\ url -> Command.call command ["-t", "ANSIUTF8", url])
@@ -101,7 +101,7 @@ main (parseOptions -> (dryRun, (prepare, (printQR, args)))) = do
 
   putStr . unlines $ "" : SystemInfo.pretty system
 
-  times <- run cacheDir (withTempDirectory baseDir "build") dryRun prepare args stage0 concurrency
+  times <- run cacheDir (withTempDirectory baseDir "build") config args stage0 concurrency
   unless (null times) do
     putStrLn "\ntimes:"
     for_ times \ (Label name, time) -> do
@@ -112,8 +112,8 @@ main (parseOptions -> (dryRun, (prepare, (printQR, args)))) = do
 
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 
-run :: FilePath -> WithTempDirectory -> DryRun -> Prepare -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
-run cacheDir withTemp dryRun prepare args stage0 concurrency = requireDependencies >> case args of
+run :: FilePath -> WithTempDirectory -> Config -> [String] -> FilePath -> Concurrency -> IO [(Label, Seconds)]
+run cacheDir withTemp config args stage0 concurrency = requireDependencies >> case args of
   [] -> runAll
   [name] | Just action <- lookup name actions -> action
   _ -> die usage
@@ -138,13 +138,13 @@ run cacheDir withTemp dryRun prepare args stage0 concurrency = requireDependenci
     runAll = concat <$> sequence (map snd actions)
 
     actions :: [(String, IO [(Label, Seconds)])]
-    actions = map (fmap $ withTemp . runBenchmark dryRun prepare) benchmarkActions
+    actions = map (fmap $ withTemp . runBenchmark config) benchmarkActions
 
     usage :: FilePath
-    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ]"
+    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ] [ --qr ]"
 
-runBenchmark :: DryRun -> Prepare -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
-runBenchmark dryRun prepare action dir = case (dryRun, prepare) of
-  (DryRun, _) -> Benchmark.dryRun $ Benchmark.cd dir action
-  (_, Prepare) -> Benchmark.prepare $ Benchmark.cd dir action
-  _ -> Benchmark.run $ Benchmark.cd dir action
+runBenchmark :: Config -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
+runBenchmark config action dir = case config.mode of
+  DryRun -> Benchmark.dryRun $ Benchmark.cd dir action
+  Prepare -> Benchmark.prepare $ Benchmark.cd dir action
+  Run -> Benchmark.run $ Benchmark.cd dir action
