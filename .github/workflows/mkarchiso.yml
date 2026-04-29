@@ -18,6 +18,11 @@ jobs:
       - run: cat /etc/passwd
       - run: pacman -Sy git github-cli sudo archiso base-devel --noconfirm
       - uses: actions/checkout@v6
+      - name: publish
+        run: |
+          gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz
       - run: tar -xvf cabal.tar.xz
       - run: rm cabal.tar.xz
