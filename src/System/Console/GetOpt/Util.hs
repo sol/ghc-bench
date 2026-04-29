@@ -7,7 +7,13 @@ import System.Environment
 import System.Console.GetOpt
 
 evalWithHelp :: config -> [OptDescr (config -> config)] -> [String] -> IO (config, [String])
-evalWithHelp defaults = evalIO defaults . appendHelpOption . liftM
+evalWithHelp defaults = evalIOWithHelp defaults . liftM
+
+evalIOWithHelp :: config -> [OptDescr (config -> IO config)] -> [String] -> IO (config, [String])
+evalIOWithHelp defaults = evalIO defaults . appendHelpOption
+
+eval :: config -> [OptDescr (config -> config)] -> [String] -> IO (config, [String])
+eval defaults = evalIO defaults . liftM
 
 evalIO :: config -> [OptDescr (config -> IO config)] -> [String] -> IO (config, [String])
 evalIO defaults options argv = case getOpt Permute options argv of

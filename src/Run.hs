@@ -60,20 +60,28 @@ data Mode = DryRun | Prepare | Run
 data Config = Config {
   mode :: Mode
 , printQR :: Bool
+, jobs :: Maybe Concurrency
 } deriving (Eq, Show)
 
 defaultConfig :: Config
 defaultConfig = Config {
     mode = Run
   , printQR = False
+  , jobs = Nothing
   }
 
 parseOptions :: [String] -> IO (Config, [String])
-parseOptions = GetOpt.evalWithHelp defaultConfig [
-    Option [] ["dry-run"] (NoArg \ c -> c { mode = DryRun }) ""
-  , Option [] ["prepare"] (NoArg \ c -> c { mode = Prepare }) ""
-  , Option [] ["qr"] (NoArg \ c -> c { printQR = True }) ""
+parseOptions = GetOpt.evalIOWithHelp defaultConfig [
+    Option [] ["dry-run"] (NoArg \ c -> pure c { mode = DryRun }) ""
+  , Option [] ["prepare"] (NoArg \ c -> pure c { mode = Prepare }) ""
+  , Option [] ["qr"] (NoArg \ c -> pure c { printQR = True }) ""
+  , Option ['j'] ["jobs"] (ReqArg parseConcurrency "N") ""
   ]
+
+parseConcurrency :: String -> Config -> IO Config
+parseConcurrency input c = do
+  n <- readIO input
+  pure c { jobs = Just n }
 
 main :: [String] -> IO ()
 main argv = do
@@ -97,7 +105,7 @@ main argv = do
   SystemInfo.requireAll
   stage0 <- Command.resolve ghc
   system <- SystemInfo.collect
-  concurrency <- SystemInfo.nproc
+  concurrency <- maybe SystemInfo.nproc pure config.jobs
 
   putStr . unlines $ "" : SystemInfo.pretty system
 
@@ -141,7 +149,7 @@ run cacheDir withTemp config args stage0 concurrency = requireDependencies >> ca
     actions = map (fmap $ withTemp . runBenchmark config) benchmarkActions
 
     usage :: FilePath
-    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ] [ --qr ]"
+    usage = "\nusage: ghc-bench [ " <> List.intercalate " | " (map fst actions) <> " ] [ --dry-run ] [ --prepare ] [ --qr ] [ -j N | --jobs N ]"
 
 runBenchmark :: Config -> Benchmark () -> FilePath -> IO [(Label, Seconds)]
 runBenchmark config action dir = case config.mode of
