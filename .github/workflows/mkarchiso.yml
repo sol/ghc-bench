@@ -38,6 +38,8 @@ jobs:
       - run: rm -r ~/.cache/
       - run: df -h
       - run: make iso
+      - run: df -h
+      - run: pacman -S git github-cli --noconfirm
       - name: publish
         run: |
           gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
