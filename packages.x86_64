@@ -34,7 +34,6 @@ fsarchiver
 gpart
 gpm
 gptfdisk
-grml-zsh-config
 grub
 hdparm
 hyperv
@@ -125,8 +124,9 @@ wvdial
 xdg-utils
 xfsprogs
 xl2tpd
-zsh
 
 ghc-bin
 make
 qrencode
+
+bash-completion
