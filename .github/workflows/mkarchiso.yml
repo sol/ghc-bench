@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - iso-image
+
+name: Build ISO
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      options: --privileged
+    steps:
+      - run: cat /etc/passwd
+      - uses: actions/checkout@v6
+      - run: pacman -Sy sudo archiso base-devel --noconfirm
+      - run: curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz
+      - run: tar -xvf cabal.tar.xz
+      - run: rm cabal.tar.xz
+      - run: mv cabal /usr/local/bin
+      - run: cabal update
+      - run: useradd -m -G wheel -s /bin/bash makepkg
+      - run: sudo -u makepkg make /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst
+      - run: pacman -U /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst --noconfirm
+      - run: make airootfs/usr/local/bin/cabal
+      - run: df -h
+      - run: make airootfs/usr/local/bin/ghc-bench
+      - run: df -h
+      - run: make airootfs/root/.cache/cabal
+      - run: df -h
+      - run: make airootfs/root/.cache/ghc-bench
+      - run: df -h
+      - run: pacman -Rns ghc-bin --noconfirm
+      - run: df -h
+      - run: rm -r ~/.local/
+      - run: df -h
+      - run: rm -r ~/.cache/
+      - run: df -h
+      - run: make iso
