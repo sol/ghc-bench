@@ -126,3 +126,7 @@ xdg-utils
 xfsprogs
 xl2tpd
 zsh
+
+ghc-bin
+make
+qrencode

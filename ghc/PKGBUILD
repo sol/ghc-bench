@@ -1,0 +1,25 @@
+pkgname=ghc-bin
+pkgver=9.12.4
+pkgrel=1
+pkgdesc="The Glasgow Haskell Compiler"
+arch=('x86_64')
+url="https://www.haskell.org/ghc/"
+license=('BSD-3-Clause')
+depends=(
+  'gcc'
+  'ncurses'
+  'zlib'
+  'gmp'
+  'libffi'
+)
+conflicts=('ghc')
+options=('!strip')
+
+source=("https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-x86_64-rocky8-linux.tar.xz")
+sha256sums=('414357ae54a4b978b773f8408ede2ea7fe95dd5ecc9259580860c1446e0ddf31')
+
+package() {
+  cd "ghc-${pkgver}-${arch}-unknown-linux"
+  ./configure --prefix=/usr
+  make DESTDIR="${pkgdir}" install
+}
