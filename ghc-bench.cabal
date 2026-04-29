@@ -34,6 +34,7 @@ executable ghc-bench
       Imports
       Result
       Run
+      System.Console.GetOpt.Util
       SystemInfo
       SystemInfo.Type
   hs-source-dirs:
@@ -77,6 +78,7 @@ test-suite spec
       Imports
       Result
       Run
+      System.Console.GetOpt.Util
       SystemInfo
       SystemInfo.Type
       CommandSpec
