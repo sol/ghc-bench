@@ -1,9 +1,12 @@
+name: Build ISO
+
+permissions:
+  contents: write
+
 on:
   push:
     branches:
       - iso-image
-
-name: Build ISO
 
 jobs:
   build:
@@ -44,3 +47,5 @@ jobs:
         run: |
           gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
           gh release upload live-iso-image /tmp/ghc-bench/live/out/ghc-bench-live-latest-x86_64.iso --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
