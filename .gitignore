@@ -1,0 +1,4 @@
+/airootfs/usr/local/bin/cabal
+/airootfs/usr/local/bin/ghc-bench
+/airootfs/root/.cache/cabal/
+/airootfs/root/.cache/ghc-bench/
