@@ -17,6 +17,7 @@ jobs:
     steps:
       - run: cat /etc/passwd
       - run: pacman -Sy git github-cli sudo archiso base-devel --noconfirm
+      - run: git config --global --add safe.directory '*'
       - uses: actions/checkout@v6
       - name: publish
         run: |
