@@ -38,3 +38,7 @@ jobs:
       - run: rm -r ~/.cache/
       - run: df -h
       - run: make iso
+      - name: publish
+        run: |
+          gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
+          gh release upload live-iso-image /tmp/ghc-bench/live/out/ghc-bench-live-latest-x86_64.iso --clobber
