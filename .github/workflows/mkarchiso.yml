@@ -16,8 +16,8 @@ jobs:
       options: --privileged
     steps:
       - run: cat /etc/passwd
+      - run: pacman -Sy git github-cli sudo archiso base-devel --noconfirm
       - uses: actions/checkout@v6
-      - run: pacman -Sy sudo archiso base-devel --noconfirm
       - run: curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz
       - run: tar -xvf cabal.tar.xz
       - run: rm cabal.tar.xz
@@ -42,7 +42,6 @@ jobs:
       - run: df -h
       - run: make iso
       - run: df -h
-      - run: pacman -S git github-cli --noconfirm
       - name: publish
         run: |
           gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
