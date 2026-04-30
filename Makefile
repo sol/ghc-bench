@@ -44,6 +44,7 @@ $(USER_CACHE_DIRS): $(CABAL_BIN) $(GHC_BENCH_BIN)
 	git checkout airootfs/root/.config/cabal/config
 	rm -r airootfs/root/.local/state/cabal/store/
 	rm -r airootfs/root/.cache/cabal/logs/
+	rm airootfs/root/.cache/cabal/packages/hackage.haskell.org/01-index.tar.gz
 
 $(CABAL_BIN):
 	$(CABAL_INSTALL) cabal-install
