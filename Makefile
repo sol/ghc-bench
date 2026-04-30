@@ -41,7 +41,7 @@ $(USER_CACHE_DIRS): $(CABAL_BIN) $(GHC_BENCH_BIN)
 	rm -f airootfs/root/.config/cabal/config
 	HOME=$(SRC)/airootfs/root $(CABAL_BIN) update
 	HOME=$(SRC)/airootfs/root $(GHC_BENCH_BIN) --prepare
-	sed -i 's/\/home\/.*\/airootfs//' airootfs/root/.config/cabal/config
+	git checkout airootfs/root/.config/cabal/config
 	rm -r airootfs/root/.local/state/cabal/store/
 	rm -r airootfs/root/.cache/cabal/logs/
 	rm airootfs/root/.cache/cabal/packages/hackage.haskell.org/01-index.tar.gz
