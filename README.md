@@ -36,7 +36,7 @@ I'm interested in the following workloads:
 - Building a Cabal project
 - Loading a project into `ghci`
 
-## Running `ghc-bench` (Linux only)
+## Running `ghc-bench`
 
 Requirements:
 
@@ -51,6 +51,56 @@ $ ghc-bench
 ```
 
 If you need detailed instructions for `ghcup` or `stack` then read on.
+
+### Running `ghc-bench` from a bootable USB drive
+
+- provides a consistent environment for benchmarking
+- does not require network connectivity; results are submitted via a QR code
+- based on [`archiso`](https://wiki.archlinux.org/title/Archiso) (see the corresponding [GiHub Actions workflow](https://github.com/sol/ghc-bench/blob/iso-image/.github/workflows/mkarchiso.yml))
+#### Prepare a bootable USB drive
+
+Download the `ghc-bench` live ISO image from
+https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso and transfer it to a USB drive with whatever method you prefer.
+
+For example on Linux I like to do this:
+
+Find the device file for the USB drive:
+```bash
+ls -l /dev/disk/by-id/usb-*
+USB_DRIVE=...
+```
+
+Download the `ghc-bench` ISO image and copy it directly to the USB drive:
+```bash
+ISO_IMAGE=https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso
+sudo -v && curl -fL# $ISO_IMAGE | sudo dd of="$USB_DRIVE"
+```
+or
+```bash
+sudo -v && curl -fL# $ISO_IMAGE | sudo tee "$USB_DRIVE" > /dev/null
+```
+or
+```bash
+wget $ISO_IMAGE
+sudo pv ghc-bench-live-latest-x86_64.iso -Yo "$USB_DRIVE"
+```
+or if you feel adventurous
+```bash
+sudo curl -fL# $ISO_IMAGE -o "$USB_DRIVE"
+```
+
+#### Boot from the USB drive and run `ghc-bench`
+
+1. First use `--dry-run` and make sure that you can submit results via the generated QR code:
+   ```bash
+   ghc-bench --qr --dry-run
+   ```
+   (make sure that the whole QR code fits on your screen and that you have a device that is capable of opening the corresponding URL)
+1. Run run `ghc-bench`
+   ```bash
+   ghc-bench --qrm
+   ```
+1. Submit the result by scanning the generated QR code and opening the corresponding GitHub issue URL (if your prompted to select an issue template, select "Benchmark result", this might happen if you are using the GitHub mobile app)
 
 ### Running `ghc-bench` with `ghcup`
 
@@ -91,6 +141,7 @@ To submit a benchmark result, follow these two steps:
 1. Submit the GitHub issue
 
 Benchmark results are then processed by a GitHub Action.
+
 ## Details
 
 Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
