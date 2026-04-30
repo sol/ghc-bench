@@ -15,8 +15,8 @@ jobs:
       image: archlinux
       options: --privileged
     steps:
-      - run: cat /etc/passwd
       - run: pacman -Sy git github-cli sudo archiso base-devel --noconfirm
+      - run: echo foo | sha256sum
       - run: git config --global --add safe.directory '*'
       - uses: actions/checkout@v6
       - name: publish
@@ -33,24 +33,17 @@ jobs:
       - run: sudo -u makepkg make /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst
       - run: pacman -U /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst --noconfirm
       - run: make airootfs/usr/local/bin/cabal
-      - run: df -h
       - run: make airootfs/usr/local/bin/ghc-bench
-      - run: df -h
       - run: make airootfs/root/.cache/cabal
-      - run: df -h
       - run: make airootfs/root/.cache/ghc-bench
-      - run: df -h
       - run: pacman -Rns ghc-bin --noconfirm
-      - run: df -h
       - run: rm -r ~/.local/
-      - run: df -h
       - run: rm -r ~/.cache/
-      - run: df -h
       - run: make iso
-      - run: df -h
       - name: publish
         run: |
           gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
           gh release upload live-iso-image /tmp/ghc-bench/live/out/ghc-bench-live-latest-x86_64.iso --clobber
         env:
           GH_TOKEN: ${{ github.token }}
+      - run: sha256sum /tmp/ghc-bench/live/out/ghc-bench-live-latest-x86_64.iso
