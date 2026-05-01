@@ -28,7 +28,7 @@ jobs:
           ref: iso-image
       - name: Install cabal-install
         run: |
-          curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz | tar -xJ
+          curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz | tar -xJ
           mv cabal /usr/local/bin
       - run: cabal update
       - run: useradd -m -G wheel -s /bin/bash makepkg
