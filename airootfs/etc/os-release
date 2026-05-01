@@ -1,6 +1,7 @@
-NAME="ghc-bench Linux live environment"
-PRETTY_NAME="ghc-bench Linux live environment"
-ID=arch
+NAME="ghc-bench Live Environment"
+PRETTY_NAME="ghc-bench Live Environment"
+ID=ghc-bench-live
+ID_LIKE=arch
 BUILD_ID=rolling
 ANSI_COLOR="38;2;23;147;209"
 HOME_URL="https://archlinux.org/"
