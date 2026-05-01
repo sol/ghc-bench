@@ -1,0 +1,12 @@
+NAME="ghc-bench Live Environment"
+PRETTY_NAME="ghc-bench Live Environment"
+ID=ghc-bench-live
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;23;147;209"
+HOME_URL="https://github.com/sol/ghc-bench"
+DOCUMENTATION_URL="https://github.com/sol/ghc-bench#readme"
+SUPPORT_URL="https://github.com/sol/ghc-bench/issues/new?labels=iso-image"
+BUG_REPORT_URL="https://github.com/sol/ghc-bench/issues/new?labels=iso-image"
+PRIVACY_POLICY_URL="https://terms.archlinux.org/docs/privacy-policy/"
+LOGO=archlinux-logo
