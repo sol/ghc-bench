@@ -3,10 +3,16 @@ name: Build ISO
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
       - iso-image
+  schedule:
+    - cron: 0 0 * * *
 
 jobs:
   build:
@@ -16,18 +22,14 @@ jobs:
       options: --privileged
     steps:
       - run: pacman -Sy git github-cli sudo archiso base-devel --noconfirm
-      - run: echo foo | sha256sum
       - run: git config --global --add safe.directory '*'
       - uses: actions/checkout@v6
-      - name: publish
+        with:
+          ref: iso-image
+      - name: Install cabal-install
         run: |
-          gh release create live-iso-image || (git tag live-iso-image -f && git push --tags -f)
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - run: curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz
-      - run: tar -xvf cabal.tar.xz
-      - run: rm cabal.tar.xz
-      - run: mv cabal /usr/local/bin
+          curl https://downloads.haskell.org/~cabal/cabal-install-3.16.1.0/cabal-install-3.16.1.0-x86_64-linux-rocky8.tar.xz -o cabal.tar.xz | tar -xJ
+          mv cabal /usr/local/bin
       - run: cabal update
       - run: useradd -m -G wheel -s /bin/bash makepkg
       - run: sudo -u makepkg make /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst
