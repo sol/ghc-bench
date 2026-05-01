@@ -34,13 +34,6 @@ jobs:
       - run: useradd -m -G wheel -s /bin/bash makepkg
       - run: sudo -u makepkg make /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst
       - run: pacman -U /tmp/ghc-bench/live/pacman/ghc-bin-9.12.4-1-x86_64.pkg.tar.zst --noconfirm
-      - run: make airootfs/usr/local/bin/cabal
-      - run: make airootfs/usr/local/bin/ghc-bench
-      - run: make airootfs/root/.cache/cabal
-      - run: make airootfs/root/.cache/ghc-bench
-      - run: pacman -Rns ghc-bin --noconfirm
-      - run: rm -r ~/.local/
-      - run: rm -r ~/.cache/
       - run: make iso
       - name: publish
         run: |
