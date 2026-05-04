@@ -48,18 +48,21 @@ jobs:
 
       - name: Create branch
         run: |
-          BRANCH='auto/process-result-${{ github.event.issue.number }}'
           git checkout -b "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+        env:
+          BRANCH: "auto/process-result-${{ github.event.issue.number }}"
 
       - name: Commit changes
         run: |
-          AUTHOR_NAME="${{ github.event.issue.user.login }}"
-          AUTHOR_EMAIL="${{ github.event.issue.user.login }}@users.noreply.github.com"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add raw results README.md
-          git commit --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" -m "${{ github.event.issue.title }}"
+          git commit --author="$AUTHOR_NAME <$AUTHOR_EMAIL>" -m "$TITEL"
+        env:
+          TITLE: ${{ github.event.issue.title }}
+          AUTHOR_NAME: ${{ github.event.issue.user.login }}
+          AUTHOR_EMAIL: "${{ github.event.issue.user.login }}@users.noreply.github.com"
 
       - name: Push branch
         run: |
@@ -69,10 +72,9 @@ jobs:
 
       - name: Create PR
         run: |
-          gh pr create \
-            --title "${{ github.event.issue.title }}" \
-            --body "Close #${{ github.event.issue.number }}." \
-            --head "$BRANCH"
+          gh pr create --title "$TITLE" --body "$BODY" --head "$BRANCH"
           gh pr merge --auto --merge "$BRANCH"
         env:
           GITHUB_TOKEN: ${{ secrets.OPEN_RESULT_PR }}
+          TITLE: ${{ github.event.issue.title }}
+          BODY: "Close #${{ github.event.issue.number }}."
