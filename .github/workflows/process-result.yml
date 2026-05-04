@@ -48,9 +48,10 @@ jobs:
 
       - name: Create branch
         run: |
-          BRANCH='auto/process-result-${{ github.event.issue.number }}'
           git checkout -b "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+        env:
+          BRANCH: "auto/process-result-${{ github.event.issue.number }}"
 
       - name: Commit changes
         run: |
@@ -71,11 +72,9 @@ jobs:
 
       - name: Create PR
         run: |
-          gh pr create \
-            --title "$TITLE" \
-            --body "Close #${{ github.event.issue.number }}." \
-            --head "$BRANCH"
+          gh pr create --title "$TITLE" --body "$BODY" --head "$BRANCH"
           gh pr merge --auto --merge "$BRANCH"
         env:
           GITHUB_TOKEN: ${{ secrets.OPEN_RESULT_PR }}
           TITLE: ${{ github.event.issue.title }}
+          BODY: "Close #${{ github.event.issue.number }}."
