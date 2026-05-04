@@ -11,6 +11,7 @@
 | [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
 | [AMD Ryzen 5 5600X](results/unknown/unknown/AMD_Ryzen_5_5600X) | 730s (12m 10s) | 35s | 16s | 7s |
 | [AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) | 754s (12m 34s) | 33s | 15s | 5s |
+| [Intel Core i7-9700](results/intel/unknown/Intel(R)_Core(TM)_i7-9700_CPU_@_3.00GHz) | 924s (15m 24s) | 49s | 23s | 7s |
 | [Intel Core Ultra 7 258V](results/intel/unknown/Intel(R)_Core(TM)_Ultra_7_258V) | 995s (16m 35s) | 60s (1m 0s) | 18s | 7s |
 | [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - | - |
 
