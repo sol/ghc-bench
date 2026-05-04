@@ -139,9 +139,6 @@ Exact steps performed by `ghc-bench`:
 1. Build Hadrian (not measured as part of the benchmark) by invoking `hadrian/build --help` to trigger dependency compilation
 1. Run `hadrian/build -j$(nproc) --flavour=quickest`
 
-**Auditing `ghc-bench`**
-- Use `--dry-run` to see what exact actions `ghc-bench` will perform ([latest dump](/test/dry-run))
-- 
-
-**Auditing the ISO image**
-[Build Verification and Trust Model for the Live ISO Image](https://github.com/sol/ghc-bench/wiki/Build-Verification-and-Trust-Model-for-the-Live-ISO-Image)
+**Auditing**
+- [Auditing `ghc-bench`](https://github.com/sol/ghc-bench/wiki/Auditing-ghc%E2%80%90bench)
+- [Build Verification and Trust Model for the Live ISO Image](https://github.com/sol/ghc-bench/wiki/Build-Verification-and-Trust-Model-for-the-Live-ISO-Image)
