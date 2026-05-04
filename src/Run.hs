@@ -42,7 +42,7 @@ sourceTarball dir = Tarball {
     blob = Blob {
       url = "https://downloads.haskell.org/~ghc/" <> version <> "/ghc-" <> version <> "-src.tar.gz"
     , path = dir </> "ghc-" <> version <> "-src.tar.gz"
-    , hash = "078e0272f52407601e24f054a1efc2c5"
+    , hash = "df71d96169056d3a6d7ec17498864cbdd5511bda196440dc38a692133833dfa4"
     }
   , root = "ghc-" <> version
   }
