@@ -31,7 +31,24 @@ updateResults (resultTable -> results) = splitOutResultTable >>> \ case
   where
     splitOutResultTable = T.breakOnEnd "## Benchmark results\n" >>> (<&> T.breakOn "## ")
 
-type Configuration = (Cpu, Concurrency)
+type Configuration = (Virtualized, Cpu, Concurrency)
+
+data Virtualized = NotVirtualized | Virtualized | WSL2
+  deriving (Eq, Show, Ord)
+
+isVirtualized :: SystemInfo -> Virtualized
+isVirtualized system = case system.product.name of
+  "vServer" -> Virtualized
+  "VirtualBox" -> Virtualized
+  _ | "QEMU" <- system.vendor -> Virtualized
+
+  _ | "Ubuntu" <- system.os
+    , "x86_64" <- system.arch
+    , "unknown" <- system.vendor
+    , Product "unknown" "unknown" "unknown" "unknown" "unknown" <- system.product
+    , Board "unknown" "unknown" <- system.board -> WSL2
+
+  _ -> NotVirtualized
 
 aggregateResults :: [Result] -> Map Configuration (Map Label [Seconds])
 aggregateResults = map resultTimes >>> Map.fromListWith (Map.unionWith (++))
@@ -40,7 +57,7 @@ aggregateResults = map resultTimes >>> Map.fromListWith (Map.unionWith (++))
     resultTimes result = (configuration, return <$> Map.fromList result.times)
       where
         configuration :: Configuration
-        configuration = (result.system.cpu, result.concurrency)
+        configuration = (isVirtualized result.system, result.system.cpu, result.concurrency)
 
 resultTable :: [Result] -> Text
 resultTable results = unlines $ map joinColumns table
@@ -73,7 +90,10 @@ resultTable results = unlines $ map joinColumns table
             columns = map (`Map.lookup` medians) labels
 
     formatRow :: (Configuration, [Maybe Seconds]) -> [Text]
-    formatRow ((cpu, _), times) = formatCpu cpu : map formatColumn times
+    formatRow = \ case
+      ((NotVirtualized, cpu, _), times) -> formatCpu cpu : map formatColumn times
+      ((Virtualized, cpu, _), times) -> formatCpu cpu <> " (vm)" : map formatColumn times
+      ((WSL2, cpu, _), times) -> formatCpu cpu <> " (WSL2)" : map formatColumn times
       where
         formatColumn :: Maybe Seconds -> Text
         formatColumn = \ case

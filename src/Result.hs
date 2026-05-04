@@ -112,8 +112,9 @@ cpuName cpu = case cpu.vendor of
 
 formatTime :: Seconds -> Text
 formatTime (Seconds seconds) = case seconds `divMod` 60 of
-  (0, s) -> show s <> "s"
-  (m, s) -> mconcat [show seconds, "s (", show m, "m ", show s, "s)"]
+  (0, _) -> show seconds <> "s"
+  (1, 0) -> show seconds <> "s"
+  (m, s) -> mconcat [show seconds, "s (", show m, "m", show s, "s)"]
 
 unknown :: Text -> Bool
 unknown = (== "To Be Filled By O.E.M.")

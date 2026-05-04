@@ -4,16 +4,16 @@
 
 | CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs) | [containers-0.8-ghci](src/Benchmark/Ghci.hs) |
 | --- | --- | --- | --- | --- |
-| [Intel Core Ultra 9 285K](results/intel/core_ultra_series_2/285K) | 388s (6m 28s) | 17s | 10s | 4s |
-| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 524s (8m 44s) | 28s | 13s | 5s |
-| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 588s (9m 48s) | 29s | 15s | 6s |
-| [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) | 661s (11m 1s) | 27s | 21s | 7s |
-| [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m 55s) | - | - | - |
-| [AMD Ryzen 5 5600X](results/unknown/unknown/AMD_Ryzen_5_5600X) | 730s (12m 10s) | 35s | 16s | 7s |
-| [AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) | 754s (12m 34s) | 33s | 15s | 5s |
-| [Intel Core i7-9700](results/intel/unknown/Intel(R)_Core(TM)_i7-9700_CPU_@_3.00GHz) | 924s (15m 24s) | 49s | 23s | 7s |
-| [Intel Core Ultra 7 258V](results/intel/unknown/Intel(R)_Core(TM)_Ultra_7_258V) | 995s (16m 35s) | 60s (1m 0s) | 18s | 7s |
-| [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m 13s) | - | - | - |
+| [Intel Core Ultra 9 285K](results/intel/core_ultra_series_2/285K) | 388s (6m28s) | 17s | 10s | 4s |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 524s (8m44s) | 28s | 13s | 5s |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) (vm) | 588s (9m48s) | 29s | 15s | 6s |
+| [AMD EPYC-Genoa Processor](results/amd/unknown/AMD_EPYC-Genoa_Processor) (vm) | 661s (11m1s) | 27s | 21s | 7s |
+| [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m55s) | - | - | - |
+| [AMD Ryzen 5 5600X](results/unknown/unknown/AMD_Ryzen_5_5600X) | 730s (12m10s) | 35s | 16s | 7s |
+| [AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) (vm) | 754s (12m34s) | 33s | 15s | 5s |
+| [Intel Core i7-9700](results/intel/unknown/Intel(R)_Core(TM)_i7-9700_CPU_@_3.00GHz) (WSL2) | 924s (15m24s) | 49s | 23s | 7s |
+| [Intel Core Ultra 7 258V](results/intel/unknown/Intel(R)_Core(TM)_Ultra_7_258V) (WSL2) | 995s (16m35s) | 60s | 18s | 7s |
+| [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m13s) | - | - | - |
 
 ## About
 `ghc-bench` measures how well a system performs on Haskell development workloads compared to other systems.
