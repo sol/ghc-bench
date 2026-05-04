@@ -18,7 +18,8 @@ import System.Console.GetOpt
 import System.Console.GetOpt.Util qualified as GetOpt
 
 import Command qualified
-import SystemInfo (Concurrency)
+import Fields
+import SystemInfo (SystemInfo, Concurrency)
 import SystemInfo qualified
 import Blob (Blob(..))
 import Blob qualified
@@ -107,7 +108,7 @@ main argv = do
   system <- SystemInfo.collect
   concurrency <- maybe SystemInfo.nproc pure config.jobs
 
-  putStr . unlines $ "" : SystemInfo.pretty system
+  putStr . unlines $ "" : pretty system
 
   times <- run cacheDir (withTempDirectory baseDir "build") config args stage0 concurrency
   unless (null times) do
@@ -117,6 +118,9 @@ main argv = do
 
     putStrLn ""
     Result.submit Result {..} qrencode
+
+pretty :: SystemInfo -> [Text]
+pretty = toFields >>> labelWith "system" >>> formatFields
 
 type WithTempDirectory = forall a. (FilePath -> IO a) -> IO a
 

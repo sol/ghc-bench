@@ -1,53 +1,13 @@
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DefaultSignatures #-}
-module SystemInfo.Type (
-  SystemInfo(..)
-, Product(..)
-, Board(..)
-, Cpu(..)
-
-, pretty
-) where
+module Fields where
 
 import Imports
 import GHC.Generics
 import Data.Text qualified as T
 
-data SystemInfo = SystemInfo {
-  os :: Text
-, arch :: Text
-, vendor :: Text
-, product :: Product
-, board :: Board
-, cpu :: Cpu
-, ram :: Int
-} deriving (Eq, Show, Generic, ToFields)
-
-data Product = Product {
-  category :: Text
-, chassis_type :: Text
-, family :: Text
-, name :: Text
-, version :: Text
-} deriving (Eq, Show, Generic, ToFields)
-
-data Board = Board {
-  vendor :: Text
-, name :: Text
-} deriving (Eq, Show, Generic, ToFields)
-
-data Cpu = Cpu {
-  name :: Text
-, cores :: Int
-, threads :: Int
-, vendor :: Maybe Text
-, family :: Maybe Text
-, model :: Maybe Text
-, stepping :: Maybe Text
-} deriving (Eq, Ord, Show, Generic, ToFields)
-
-pretty :: SystemInfo -> [Text]
-pretty = toFields >>> labelWith "system" >>> formatFields
+formatFields :: Fields -> [Text]
+formatFields = map \ case
+  (name, value) -> T.intercalate "." name <> ": " <> value
 
 type Fields = [([Text], Text)]
 
@@ -69,10 +29,6 @@ instance ToFields a => ToFields (Maybe a) where
   toFields = \ case
     Nothing -> leaf "unknown"
     Just value -> toFields value
-
-formatFields :: Fields -> [Text]
-formatFields = map \ case
-  (name, value) -> T.intercalate "." name <> ": " <> value
 
 labelWith :: String -> Fields -> Fields
 labelWith = map . first . (:) . pack

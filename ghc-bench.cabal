@@ -31,12 +31,12 @@ executable ghc-bench
       Benchmark.Util
       Blob
       Command
+      Fields
       Imports
       Result
       Run
       System.Console.GetOpt.Util
       SystemInfo
-      SystemInfo.Type
   hs-source-dirs:
       src
       driver
@@ -75,12 +75,12 @@ test-suite spec
       Benchmark.Util
       Blob
       Command
+      Fields
       Imports
       Result
       Run
       System.Console.GetOpt.Util
       SystemInfo
-      SystemInfo.Type
       CommandSpec
       Fixtures.System
       Helper
