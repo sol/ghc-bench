@@ -36,7 +36,9 @@ I'm interested in the following workloads:
 - Building a Cabal project
 - Loading a project into `ghci`
 
-## Running `ghc-bench` (Linux only)
+## Running `ghc-bench`
+
+NOTE: If you are on Windows, you can run `ghc-bench` from a bootable USB drive (see next section).
 
 Requirements:
 
@@ -50,7 +52,33 @@ If all of these are on your `PATH` you can benchmark your system with:
 $ ghc-bench
 ```
 
-If you need detailed instructions for `ghcup` or `stack` then read on.
+If you want to know about other options or need detailed instructions then read on.
+
+### Running `ghc-bench` from a bootable USB drive
+
+**Advantage**
+
+- provides a consistent environment for benchmarking
+- does not require network connectivity; results are submitted via a QR code
+- based on [`archiso`](https://wiki.archlinux.org/title/Archiso) (see the corresponding [GiHub Actions workflow](https://github.com/sol/ghc-bench/blob/iso-image/.github/workflows/mkarchiso.yml))
+
+**Steps**
+
+Download
+https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso and [prepare a bootable USB drive](https://github.com/sol/ghc-bench/wiki/Preparing-a-bootable-USB-drive).
+
+After booting into the live environment:
+
+1. First use `--dry-run` and make sure that you can submit results via the generated QR code:
+   ```bash
+   ghc-bench --qr --dry-run
+   ```
+   (make sure that the whole QR code fits on your screen and that you have a device that is capable of opening the corresponding URL)
+1. Run `ghc-bench`
+   ```bash
+   ghc-bench --qr
+   ```
+1. Submit the result by scanning the generated QR code and opening the corresponding GitHub issue URL (if you are prompted to select an issue template, select "Benchmark result", this might happen if you are using the GitHub mobile app)
 
 ### Running `ghc-bench` with `ghcup`
 
@@ -91,6 +119,7 @@ To submit a benchmark result, follow these two steps:
 1. Submit the GitHub issue
 
 Benchmark results are then processed by a GitHub Action.
+
 ## Details
 
 Running `ghc-bench` requires ~3.4G free space in `/tmp/`.
@@ -109,3 +138,7 @@ Exact steps performed by `ghc-bench`:
 1. Run `./configure`
 1. Build Hadrian (not measured as part of the benchmark) by invoking `hadrian/build --help` to trigger dependency compilation
 1. Run `hadrian/build -j$(nproc) --flavour=quickest`
+
+**Auditing**
+- [Auditing `ghc-bench`](https://github.com/sol/ghc-bench/wiki/Auditing-ghc%E2%80%90bench)
+- [Build Verification and Trust Model for the Live ISO Image](https://github.com/sol/ghc-bench/wiki/Build-Verification-and-Trust-Model-for-the-Live-ISO-Image)
