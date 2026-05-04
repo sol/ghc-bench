@@ -74,7 +74,7 @@ After booting into the live environment:
    ghc-bench --qr --dry-run
    ```
    (make sure that the whole QR code fits on your screen and that you have a device that is capable of opening the corresponding URL)
-1. Run run `ghc-bench`
+1. Run `ghc-bench`
    ```bash
    ghc-bench --qr
    ```
