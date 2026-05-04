@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+This was via WSL2. The machine is a Dell XPS 8930 with 16 GB of 2,666 MT/s RAM (not 8 GB, as stated below).
+
+### Build times (seconds)
+
+ghc-9.12.4-build:924 hedgehog-1.7-dependencies:49 hedgehog-1.7-build:23 containers-0.8-ghci:7
+
+### Used number of threads
+
+8
+
+### CPU Name
+
+Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 158 / 13
+
+### Cores
+
+8
+
+### Threads
+
+8
+
+### Operating System
+
+Ubuntu
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+unknown unknown
+
+### RAM Size (GB)
+
+8
+
+### System Vendor
+
+unknown
+
+### Product Category
+
+unknown
+
+### Chassis Type
+
+unknown
+
+### Product Family
+
+unknown
+
+### Product Name
+
+unknown
+
+### Product Version
+
+unknown
