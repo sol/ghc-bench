@@ -1,6 +1,6 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module SystemInfo (
   collect
-, pretty
 , requireAll
 , SystemInfo(..)
 , Product(..)
@@ -19,8 +19,41 @@ import Control.Exception
 import Data.Text qualified as T
 import Data.Text.IO.Utf8 qualified as Utf8
 
-import SystemInfo.Type
+import Fields
 import Command qualified
+
+data SystemInfo = SystemInfo {
+  os :: Text
+, arch :: Text
+, vendor :: Text
+, product :: Product
+, board :: Board
+, cpu :: Cpu
+, ram :: Int
+} deriving (Eq, Show, Generic, ToFields)
+
+data Product = Product {
+  category :: Text
+, chassis_type :: Text
+, family :: Text
+, name :: Text
+, version :: Text
+} deriving (Eq, Show, Generic, ToFields)
+
+data Board = Board {
+  vendor :: Text
+, name :: Text
+} deriving (Eq, Show, Generic, ToFields)
+
+data Cpu = Cpu {
+  name :: Text
+, cores :: Int
+, threads :: Int
+, vendor :: Maybe Text
+, family :: Maybe Text
+, model :: Maybe Text
+, stepping :: Maybe Text
+} deriving (Eq, Ord, Show, Generic, ToFields)
 
 collect :: IO SystemInfo
 collect = do
