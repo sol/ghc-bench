@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 5
+  ghc-9.12.4-build: 754
+  hedgehog-1.7-build: 15
+  hedgehog-1.7-dependencies: 33
+concurrency: 6
+system:
+  os: Debian GNU/Linux
+  arch: x86_64
+  vendor: innotek GmbH
+  product:
+    category: unknown
+    chassis_type: '1'
+    name: VirtualBox
+    family: Virtual Machine
+    version: '1.2'
+  board:
+    name: VirtualBox
+    vendor: Oracle Corporation
+  cpu:
+    name: AMD Ryzen 9 9900X3D 12-Core Processor (6 Cores through Virtualbox)
+    cores: 6
+    threads: 6
+    vendor: AuthenticAMD
+    family: '26'
+    model: '68'
+    stepping: '0'
+  ram: 32
