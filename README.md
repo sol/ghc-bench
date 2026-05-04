@@ -38,6 +38,8 @@ I'm interested in the following workloads:
 
 ## Running `ghc-bench`
 
+NOTE: If you are on Windows, you can run `ghc-bench` from a bootable USB drive (see next section).
+
 Requirements:
 
 - `cabal`
@@ -50,46 +52,22 @@ If all of these are on your `PATH` you can benchmark your system with:
 $ ghc-bench
 ```
 
-If you need detailed instructions for `ghcup` or `stack` then read on.
+If you want to know about other options or need detailed instructions then read on.
 
 ### Running `ghc-bench` from a bootable USB drive
+
+**Advantage**
 
 - provides a consistent environment for benchmarking
 - does not require network connectivity; results are submitted via a QR code
 - based on [`archiso`](https://wiki.archlinux.org/title/Archiso) (see the corresponding [GiHub Actions workflow](https://github.com/sol/ghc-bench/blob/iso-image/.github/workflows/mkarchiso.yml))
-#### Prepare a bootable USB drive
 
-Download the `ghc-bench` live ISO image from
-https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso and transfer it to a USB drive with whatever method you prefer.
+**Steps**
 
-For example on Linux I like to do this:
+Download
+https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso and [prepare a bootable USB drive](https://github.com/sol/ghc-bench/wiki/Preparing-a-bootable-USB-drive).
 
-Find the device file for the USB drive:
-```bash
-ls -l /dev/disk/by-id/usb-*
-USB_DRIVE=...
-```
-
-Download the `ghc-bench` ISO image and copy it directly to the USB drive:
-```bash
-ISO_IMAGE=https://github.com/sol/ghc-bench/releases/download/live-iso-image/ghc-bench-live-latest-x86_64.iso
-sudo -v && curl -fL# $ISO_IMAGE | sudo dd of="$USB_DRIVE"
-```
-or
-```bash
-sudo -v && curl -fL# $ISO_IMAGE | sudo tee "$USB_DRIVE" > /dev/null
-```
-or
-```bash
-wget $ISO_IMAGE
-sudo pv ghc-bench-live-latest-x86_64.iso -Yo "$USB_DRIVE"
-```
-or if you feel adventurous
-```bash
-sudo curl -fL# $ISO_IMAGE -o "$USB_DRIVE"
-```
-
-#### Boot from the USB drive and run `ghc-bench`
+After booting into the live environment:
 
 1. First use `--dry-run` and make sure that you can submit results via the generated QR code:
    ```bash
@@ -98,9 +76,9 @@ sudo curl -fL# $ISO_IMAGE -o "$USB_DRIVE"
    (make sure that the whole QR code fits on your screen and that you have a device that is capable of opening the corresponding URL)
 1. Run run `ghc-bench`
    ```bash
-   ghc-bench --qrm
+   ghc-bench --qr
    ```
-1. Submit the result by scanning the generated QR code and opening the corresponding GitHub issue URL (if your prompted to select an issue template, select "Benchmark result", this might happen if you are using the GitHub mobile app)
+1. Submit the result by scanning the generated QR code and opening the corresponding GitHub issue URL (if you are prompted to select an issue template, select "Benchmark result", this might happen if you are using the GitHub mobile app)
 
 ### Running `ghc-bench` with `ghcup`
 
