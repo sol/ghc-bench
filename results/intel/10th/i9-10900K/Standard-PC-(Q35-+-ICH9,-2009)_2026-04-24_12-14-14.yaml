@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 6
+  ghc-9.12.4-build: 588
+  hedgehog-1.7-build: 15
+  hedgehog-1.7-dependencies: 29
+concurrency: 10
+system:
+  os: Debian GNU/Linux
+  arch: x86_64
+  vendor: QEMU
+  product:
+    category: unknown
+    chassis_type: '1'
+    name: Standard PC (Q35 + ICH9, 2009)
+    family: ''
+    version: pc-q35-10.2
+  board:
+    name: unknown
+    vendor: unknown
+  cpu:
+    name: Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz
+    cores: 10
+    threads: 10
+    vendor: GenuineIntel
+    family: '6'
+    model: '165'
+    stepping: '5'
+  ram: 24
