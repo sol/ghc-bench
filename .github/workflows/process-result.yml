@@ -73,6 +73,6 @@ jobs:
             --title "${{ github.event.issue.title }}" \
             --body "Close #${{ github.event.issue.number }}." \
             --head "$BRANCH"
-          # gh pr merge --auto --merge "$BRANCH"
+          gh pr merge --auto --merge "$BRANCH"
         env:
           GITHUB_TOKEN: ${{ secrets.OPEN_RESULT_PR }}
