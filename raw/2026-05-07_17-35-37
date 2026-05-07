@@ -1,0 +1,67 @@
+### Add a description (optional)
+
+_No response_
+
+### Build times (seconds)
+
+ghc-9.12.4-build:1879 hedgehog-1.7-dependencies:112 hedgehog-1.7-build:33 containers-0.8-ghci:12
+
+### Used number of threads
+
+4
+
+### CPU Name
+
+Intel(R) Core(TM) i5-3230M CPU @ 2.60GHz
+
+### CPUID (vendor / family / model / stepping)
+
+GenuineIntel / 6 / 58 / 9
+
+### Cores
+
+2
+
+### Threads
+
+4
+
+### Operating System
+
+Ubuntu
+
+### Architecture
+
+x86_64
+
+### Motherboard
+
+LENOVO 23258BT
+
+### RAM Size (GB)
+
+4
+
+### System Vendor
+
+LENOVO
+
+### Product Category
+
+laptop
+
+### Chassis Type
+
+10
+
+### Product Family
+
+ThinkPad X230
+
+### Product Name
+
+23258BT
+
+### Product Version
+
+ThinkPad X230
