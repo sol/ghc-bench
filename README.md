@@ -13,6 +13,7 @@
 | [AMD Ryzen 9 9900X3D](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) (vm) | 754s (12m34s) | 33s | 15s | 5s |
 | [Intel Core i7-9700](results/intel/9th/i7-9700) (WSL2) | 924s (15m24s) | 49s | 23s | 7s |
 | [Intel Core Ultra 7 258V](results/intel/lunar/258V) (WSL2) | 995s (16m35s) | 60s | 18s | 7s |
+| [Intel Core i5-3230M](results/intel/unknown/Intel(R)_Core(TM)_i5-3230M_CPU_@_2.60GHz) | 1879s (31m19s) | 112s (1m52s) | 33s | 12s |
 | [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m13s) | - | - | - |
 
 ## About

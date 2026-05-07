@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 12
+  ghc-9.12.4-build: 1879
+  hedgehog-1.7-build: 33
+  hedgehog-1.7-dependencies: 112
+concurrency: 4
+system:
+  os: Ubuntu
+  arch: x86_64
+  vendor: LENOVO
+  product:
+    category: laptop
+    chassis_type: '10'
+    name: 23258BT
+    family: ThinkPad X230
+    version: ThinkPad X230
+  board:
+    name: 23258BT
+    vendor: LENOVO
+  cpu:
+    name: Intel(R) Core(TM) i5-3230M CPU @ 2.60GHz
+    cores: 2
+    threads: 4
+    vendor: GenuineIntel
+    family: '6'
+    model: '58'
+    stepping: '9'
+  ram: 4
