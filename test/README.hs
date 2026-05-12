@@ -71,6 +71,18 @@ resultTable results = unlines $ map joinColumns table
     header :: [Text]
     header = "CPU" : map formatLabel labels
 
+    isUnique :: (Virtualized, Cpu) -> Bool
+    isUnique = fromMaybe True . (`Map.lookup` uniqueMap)
+      where
+        uniqueMap :: Map (Virtualized, Cpu) Bool
+        uniqueMap = Map.mapKeysWith falseOnCollision fromConfiguration $ aggregated $> True
+
+        falseOnCollision :: Bool -> Bool -> Bool
+        falseOnCollision _ _ = False
+
+        fromConfiguration :: Configuration -> (Virtualized, Cpu)
+        fromConfiguration (virtualized, cpu, _) = (virtualized, cpu)
+
     rows :: [(Configuration, [Maybe Seconds])]
     rows = sortByTimes . map toRow $ Map.toList aggregated
       where
@@ -89,11 +101,16 @@ resultTable results = unlines $ map joinColumns table
             columns :: [Maybe Seconds]
             columns = map (`Map.lookup` medians) labels
 
+    formatConfiguration :: Configuration -> Text
+    formatConfiguration = \ case
+      (NotVirtualized, cpu, concurrency) -> formatCpu cpu <> case isUnique (NotVirtualized, cpu) of
+        False -> " (`-j" <> show concurrency <> "`)"
+        True -> ""
+      (Virtualized, cpu, _) -> formatCpu cpu <> " (vm)"
+      (WSL2, cpu, _) -> formatCpu cpu <> " (WSL2)"
+
     formatRow :: (Configuration, [Maybe Seconds]) -> [Text]
-    formatRow = \ case
-      ((NotVirtualized, cpu, _), times) -> formatCpu cpu : map formatColumn times
-      ((Virtualized, cpu, _), times) -> formatCpu cpu <> " (vm)" : map formatColumn times
-      ((WSL2, cpu, _), times) -> formatCpu cpu <> " (WSL2)" : map formatColumn times
+    formatRow (configuration, times) = formatConfiguration configuration : map formatColumn times
       where
         formatColumn :: Maybe Seconds -> Text
         formatColumn = \ case
