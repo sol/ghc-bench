@@ -235,11 +235,13 @@ basePathComponents cpu = "results" : vendor : cpuToPathComponents cpu
 
 cpuToPathComponents :: Cpu -> [Text]
 cpuToPathComponents cpu = case (cpu.vendor, cpu.family, cpu.model, cpu.stepping) of
-  (Just "GenuineIntel", Just "6", Just "198", Just "2") -> ["core_ultra_series_2", T.drop 26 cpu.name]
+  (Just "GenuineIntel", Just "6", Just "198", Just "2") -> ["arrow", T.drop 26 cpu.name]
+  (Just "GenuineIntel", Just "6", Just "197", Just "2") -> ["arrow", T.drop 26 cpu.name]
   (Just "GenuineIntel", Just "6", Just "189", Just "1") -> ["lunar", T.drop 26 cpu.name]
   (Just "GenuineIntel", Just "6", Just "140", Just "1") -> ["11th", T.take 9 $ T.drop 27 cpu.name]
   (Just "GenuineIntel", Just "6", Just "165", Just "5") -> ["10th", T.take 9 $ T.drop 18 cpu.name]
   (Just "GenuineIntel", Just "6", Just "158", Just "13") -> ["9th", T.take 7 $ T.drop 18 cpu.name]
+  (Just "GenuineIntel", Just "6", Just "58", Just "9") -> ["ivy", T.take 8 $ T.drop 18 cpu.name]
   (Just "GenuineIntel", Just "6", Just "23", Just "10") -> ["core_2", T.take 5 $ T.drop 31 cpu.name]
   _ -> ["unknown", T.replace " " "_" cpu.name]
 
