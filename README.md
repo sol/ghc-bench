@@ -1,4 +1,7 @@
-# Benchmark a Haskell development system
+# `ghc-bench`: Benchmark a Haskell development system
+
+> [!IMPORTANT]  
+> Results tagged with `vm` or `WSL2` are heavily distorted and do not accurately reflect the capabilities of the corresponding hardware.
 
 ## Benchmark results
 
