@@ -1,6 +1,9 @@
-# Benchmark a Haskell development system
+# `ghc-bench`: Benchmark a Haskell development system
 
-## Benchmark results
+> [!IMPORTANT]
+> Results tagged with `vm` or `WSL2` are heavily distorted and do not accurately reflect the capabilities of the corresponding hardware.
+
+## Benchmark results he
 
 | CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs) | [containers-0.8-ghci](src/Benchmark/Ghci.hs) |
 | --- | --- | --- | --- | --- |
