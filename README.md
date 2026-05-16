@@ -1,7 +1,19 @@
-# `ghc-bench`: Benchmark a Haskell development system
 
-> [!IMPORTANT]
-> Results tagged with `vm` or `WSL2` are heavily distorted and do not accurately reflect the capabilities of the corresponding hardware.
+| CPU | [GHC 9.12.4 build](src/Benchmark/BuildGhc.hs) | [hedgehog-1.7-dependencies](src/Benchmark/BuildCabalPackage.hs) | [hedgehog-1.7-build](src/Benchmark/BuildCabalPackage.hs) | [containers-0.8-ghci](src/Benchmark/Ghci.hs) |
+| --- | --- | --- | --- | --- |
+| [Intel Core Ultra 9 285K](results/intel/arrow/285K) | 388s (6m28s) | 17s | 10s | 4s |
+| [Intel Core Ultra 7 255H](results/intel/arrow/255H) (`-j8`) | 428s (7m8s) | 23s | 11s | 4s |
+| [Intel Core Ultra 7 255H](results/intel/arrow/255H) (`-j6`) | 429s (7m9s) | 22s | 11s | 4s |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 524s (8m44s) | 28s | 13s | 5s |
+| [Intel Core i9-10900K](results/intel/10th/i9-10900K) (vm) | 588s (9m48s) | 29s | 15s | 6s |
+| [AMD EPYC-Genoa](results/amd/unknown/AMD_EPYC-Genoa_Processor) (vm) | 661s (11m1s) | 27s | 21s | 7s |
+| [Intel Core i7-1165G7](results/intel/11th/i7-1165G7) | 715s (11m55s) | - | - | - |
+| [AMD Ryzen 5 5600X](results/unknown/unknown/AMD_Ryzen_5_5600X) | 730s (12m10s) | 35s | 16s | 7s |
+| [AMD Ryzen 9 9900X3D](results/amd/unknown/AMD_Ryzen_9_9900X3D_12-Core_Processor_(6_Cores_through_Virtualbox)) (vm) | 754s (12m34s) | 33s | 15s | 5s |
+| [Intel Core i7-9700](results/intel/9th/i7-9700) (WSL2) | 924s (15m24s) | 49s | 23s | 7s |
+| [Intel Core Ultra 7 258V](results/intel/lunar/258V) (WSL2) | 995s (16m35s) | 60s | 18s | 7s |
+| [Intel Core i5-3230M](results/intel/ivy/i5-3230M) | 1879s (31m19s) | 112s (1m52s) | 33s | 12s |
+| [Intel Core 2 Duo P8700](results/intel/core_2/P8700) | 3013s (50m13s) | - | - | - |
 
 ## Benchmark results he
 

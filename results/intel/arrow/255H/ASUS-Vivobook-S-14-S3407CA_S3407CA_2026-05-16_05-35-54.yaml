@@ -1,0 +1,28 @@
+times:
+  containers-0.8-ghci: 4
+  ghc-9.12.4-build: 425
+  hedgehog-1.7-build: 11
+  hedgehog-1.7-dependencies: 21
+concurrency: 6
+system:
+  os: Arch Linux
+  arch: x86_64
+  vendor: ASUSTeK COMPUTER INC.
+  product:
+    category: laptop
+    chassis_type: '10'
+    name: ASUS Vivobook S 14 S3407CA_S3407CA
+    family: ASUS Vivobook S 14
+    version: '1.0'
+  board:
+    name: S3407CA
+    vendor: ASUSTeK COMPUTER INC.
+  cpu:
+    name: Intel(R) Core(TM) Ultra 7 255H
+    cores: 16
+    threads: 16
+    vendor: GenuineIntel
+    family: '6'
+    model: '197'
+    stepping: '2'
+  ram: 32
