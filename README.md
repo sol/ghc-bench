@@ -3,7 +3,7 @@
 | --- | --- | --- | --- | --- |
 | [Intel Core Ultra 9 285K](results/intel/arrow/285K) | 388s (6m28s) | 17s | 10s | 4s |
 | [Intel Core Ultra 7 255H](results/intel/arrow/255H) (`-j8`) | 428s (7m8s) | 23s | 11s | 4s |
-| [Intel Core Ultra 7 255H](results/intel/arrow/255H) (`-j6`) | 429s (7m9s) | 22s | 11s | 4s |
+| [Intel Core Ultra 7 255H](results/intel/arrow/255H) (`-j6`) | 429s (7m9s) | 23s | 11s | 4s |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) | 524s (8m44s) | 28s | 13s | 5s |
 | [Intel Core i9-10900K](results/intel/10th/i9-10900K) (vm) | 588s (9m48s) | 29s | 15s | 6s |
 | [AMD EPYC-Genoa](results/amd/unknown/AMD_EPYC-Genoa_Processor) (vm) | 661s (11m1s) | 27s | 21s | 7s |
